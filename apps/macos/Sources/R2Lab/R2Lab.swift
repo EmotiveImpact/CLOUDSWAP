@@ -7,14 +7,17 @@ func mac(_ key: Data, _ text: String) -> Data {
 }
 enum LabError: Error { case config, response(Int), integrity }
 
+final class NoRedirects: NSObject, URLSessionTaskDelegate {
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
+}
+
 struct R2Client {
     let endpoint: URL
     let bucket: String
     let access: String
     let secret: String
     let session: URLSession
-    init() throws {
-        let env = ProcessInfo.processInfo.environment
+    init(env: [String: String] = ProcessInfo.processInfo.environment, configuration: URLSessionConfiguration? = nil) throws {
         guard let urlText = env["R2_ENDPOINT"], let url = URL(string: urlText),
               url.scheme == "https", let host = url.host, host.hasSuffix(".r2.cloudflarestorage.com"),
               url.user == nil, url.password == nil, url.query == nil, url.fragment == nil,
@@ -23,20 +26,23 @@ struct R2Client {
               let access = env["R2_ACCESS_KEY_ID"], !access.isEmpty,
               let secret = env["R2_SECRET_ACCESS_KEY"], !secret.isEmpty else { throw LabError.config }
         self.endpoint = url; self.bucket = bucket; self.access = access; self.secret = secret
-        let config = URLSessionConfiguration.ephemeral
+        let config = configuration ?? URLSessionConfiguration.ephemeral
         config.timeoutIntervalForRequest = 5
         config.timeoutIntervalForResource = 10
         config.urlCache = nil
-        self.session = URLSession(configuration: config)
+        self.session = URLSession(configuration: config, delegate: NoRedirects(), delegateQueue: nil)
     }
-    func request(_ method: String, key: String, body: Data = Data()) async throws -> Data {
+    func signedRequest(_ method: String, key: String, body: Data = Data(), now: Date = Date()) throws -> URLRequest {
+        guard ["PUT", "GET", "DELETE"].contains(method),
+              key.range(of: "^cloudswap-lab/[a-z0-9-]+/probe$", options: .regularExpression) != nil,
+              body.count <= 32768, method == "PUT" || body.isEmpty else { throw LabError.config }
         let uri = "/\(bucket)/\(key)"
         let url = endpoint.appendingPathComponent(bucket).appendingPathComponent(key)
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         formatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
-        let date = formatter.string(from: Date())
+        let date = formatter.string(from: now)
         let day = String(date.prefix(8))
         let scope = "\(day)/auto/s3/aws4_request"
         let payloadHash = sha(body)
@@ -51,6 +57,10 @@ struct R2Client {
         request.setValue(payloadHash, forHTTPHeaderField: "x-amz-content-sha256")
         request.setValue(date, forHTTPHeaderField: "x-amz-date")
         request.setValue("AWS4-HMAC-SHA256 Credential=\(access)/\(scope), SignedHeaders=\(signed), Signature=\(signature)", forHTTPHeaderField: "Authorization")
+        return request
+    }
+    func request(_ method: String, key: String, body: Data = Data()) async throws -> Data {
+        let request = try signedRequest(method, key: key, body: body)
         let (data, response) = try await session.data(for: request)
         guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else {
             throw LabError.response((response as? HTTPURLResponse)?.statusCode ?? 0)

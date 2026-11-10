@@ -17,3 +17,9 @@
 | Physical Wi-Fi loss | Not tested; simulations are not represented as physical trials |
 
 These checks establish a buildable foundation, not useful cloud-backed system swap. No claims of disk-space savings or improved app performance are supported yet.
+
+## Native transport follow-up
+
+Added a Swift XCTest suite exercising request scope and size limits, endpoint validation, a known-answer HMAC vector, signature payload binding, offline/reconnect, timeout propagation and HTTP failure rejection. URLSession uses a redirect-refusing delegate. Test responses are injected using URLProtocol; no physical network loss or live R2 is claimed. CI now executes the Swift suite before building the Mac application.
+
+Still required: secure bucket-scoped R2 credentials and permitted R2 network access; a compatible isolated Mac with driver-development provisioning for the SCSI experiment; a Linux VM for kernel-swap comparison. The native adapter and system-swap attachment remain unimplemented, not completed by these tests.

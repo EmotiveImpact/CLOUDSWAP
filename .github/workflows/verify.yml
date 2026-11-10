@@ -19,6 +19,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - run: swift test --package-path apps/macos
       - run: bash scripts/build-mac.sh
       - run: dist/CLOUDSWAP.app/Contents/Helpers/cloudswap-lab
       - run: dist/CLOUDSWAP.app/Contents/Helpers/R2Lab --self-test

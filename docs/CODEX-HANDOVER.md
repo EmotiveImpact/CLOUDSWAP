@@ -4,8 +4,8 @@ Updated 10 November 2026. Read this before continuing CLOUDSWAP.
 ## Current integration checkpoint
 
 PR #8 (`feat/mac-integration-lab`) consolidates every change from PRs #2 through
-#7, preserving their branch ancestry. This is the continuation branch until it
-is merged. Inspect GitHub before assuming any draft change is on `main`.
+#7, preserving their branch ancestry. It merged into `main` at `08e3e8637cbf63b8599fe2fb6c1583d61004b903`;
+PRs #2 through #7 are also merged by ancestry.
 
 The native suite now has 57 passing XCTest tests, including loss/rollback of
 an encrypted index during a session. Checkpoint reauthenticates and compares the
@@ -19,16 +19,27 @@ The Mac mounted workflow separately tests actual mount, fsync, remount, mmap
 reads and a one-second server pause on Intel and arm64 hosted Macs. Check its
 latest result; wire success does not imply mount success.
 
-No working-Mac swap configuration has been changed. Native macOS system swap,
-physical external-drive unplug, live R2 and internal disk savings remain
-unverified. The prototype is not ready to carry private live application memory.
+No working-Mac swap configuration has been changed. The mounted NFS proof
+passed on Intel macOS 15 and arm64 macOS 26; the extended Intel test also passed
+dirty mmap/msync and cold remount verification. See [integration evidence](INTEGRATION-VALIDATION.md).
+PR #9 separately observed real kernel page-out/page-in against a new APFS
+disk-image volume on the hosted Intel Mac, with complete 8.0625 GiB workload
+integrity. Physical external-drive use/unplug, cloud-backed Mac system swap,
+live R2 and internal disk savings remain unverified. The prototype is not ready to carry private live application memory.
 Read [CHAT-CONTEXT.md](CHAT-CONTEXT.md), [WORK-PACKAGES.md](WORK-PACKAGES.md),
 [the NFS lab](../labs/macos-nfs/README.md) and the dated validation records.
 
+The placement experiment also repeated successfully on Intel with 8.25 GiB
+verified. See [its evidence and limitations](../labs/macos-swap-placement/README.md),
+including the corrected thread-ID interpretation. Apple Silicon placement is
+not yet certified. No physical external SSD or live R2 result is implied.
+
 ## Earlier milestones and implementation map
 
-The records below describe successive earlier milestones. Test counts are
-historical, and references to separate feature branches are superseded by PR #8.
+The records below describe successive earlier milestones. Test counts and
+statements that runtime prefix access or all native paging are unverified are
+historical and superseded by the checkpoint above. References to separate
+feature branches are superseded by PR #8.
 
 ## What works, precisely
 | Capability | Status |

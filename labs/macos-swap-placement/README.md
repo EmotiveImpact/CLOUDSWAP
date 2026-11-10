@@ -92,3 +92,24 @@ is preserved unchanged apart from added source provenance in
 Its nested `system_swap_modified: false` fields describe the read-only collector,
 not the enclosing experiment, which did change the prefix. New reports separate
 collector actions from experiment actions explicitly.
+
+## Repeated result and attribution correction
+
+[Run 42847101980](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42847101980)
+at `8787b968cc776f76787be1bb89bfd42d2857f151` again observed native paging on
+Intel macOS 15.7.9. All 8.25 GiB of synthetic memory verified. The target trace
+captured 130 page-outs (34,004,992 bytes) and seven page-ins (1,835,008 bytes),
+and the original prefix was restored. Trace byte counts need not equal global
+counter deltas; neither is a claim that all test memory was swapped.
+
+Apple's [fs_usage manual](https://github.com/apple-oss-distributions/system_cmds/blob/main/fs_usage/fs_usage.1)
+specifies that the numeric suffix is a **thread ID**, not a process ID. The
+repeat report's `workload_target_pageins` field incorrectly compared it to the
+probe PID and must not be used for attribution. The original result remains in
+`docs/evidence/mac-placement/intel-repeat.json` with this qualification. Schema
+2 removes that comparison, explicitly reports attribution as unestablished,
+and tests that the parser never calls this suffix a PID. The volume-specific
+page-out/page-in proof does not depend on that removed field.
+
+The Apple Silicon placement job was queued when these results were recorded.
+No architecture-specific placement result is inferred from Intel success.

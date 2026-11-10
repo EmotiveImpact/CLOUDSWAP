@@ -47,10 +47,10 @@ def page_io(line, target, device):
     if not event or event[3] != '/dev/' + device: return None
     paths = (str(target) + '/swapfile', '/System/Volumes/Data' + str(target) + '/swapfile')
     if not any(re.fullmatch(re.escape(prefix) + r'[0-9]+', event[4]) for prefix in paths): return None
-    pid = re.search(r'\.(\d+)\s*$', line)
+    thread = re.search(r'\.(\d+)\s*$', line)
     return {'direction': 'out' if event[1] == 'PgOut' else 'in',
             'bytes': int(event[2], 16), 'device': device, 'path': event[4],
-            'process_pid': int(pid[1]) if pid else None}
+            'thread_id': int(thread[1]) if thread else None}
 
 
 class Trace:
@@ -59,8 +59,6 @@ class Trace:
         self.page_lines = []
         self.counts = {'in': 0, 'out': 0}
         self.byte_counts = {'in': 0, 'out': 0}
-        self.workload_pid = None
-        self.workload_pageins = 0
         self.device = device
         self.target = str(target)
         self.process = subprocess.Popen(['/usr/bin/fs_usage', '-w', '-f', 'filesys'],
@@ -73,7 +71,6 @@ class Trace:
             if event:
                 self.counts[event['direction']] += 1
                 self.byte_counts[event['direction']] += event['bytes']
-                if event['direction'] == 'in' and event['process_pid'] == self.workload_pid: self.workload_pageins += 1
                 if len(self.page_lines) < 200: self.page_lines.append(text[:2000])
             elif self.target in text and len(self.lines) < 40: self.lines.append(text[:2000])
     def stop(self):
@@ -87,16 +84,15 @@ class Trace:
         return {'exit_code': self.process.returncode, 'target_lines': self.page_lines,
                 'target_metadata_lines': self.lines, 'target_pageout_lines': self.counts['out'],
                 'target_pagein_lines': self.counts['in'], 'observed_page_io_bytes': self.byte_counts,
-                'workload_target_pageins': self.workload_pageins,
+                'workload_page_attribution': 'not_established',
                 'page_line_limit': 200, 'metadata_line_limit': 40,
                 'limitation': 'Observed trace events only; counts do not establish complete tracing or identify which allocation faulted.'}
 
 
-def memory_trial(binary, maximum, env, report, persist, snapshot, trace):
+def memory_trial(binary, maximum, env, report, persist, snapshot):
     process = subprocess.Popen([str(binary), str(maximum)], env=env, stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
     report['workload_pid'] = process.pid
-    trace.workload_pid = process.pid
     selector = selectors.DefaultSelector(); selector.register(process.stdout, selectors.EVENT_READ)
     buffer = bytearray(); deadline = time.monotonic() + 150
     events = []
@@ -148,7 +144,7 @@ def run(args):
     if not os.access(probe, os.X_OK): raise SystemExit('Memory probe is not executable')
     report_path = args.report.resolve()
     report_path.parent.mkdir(parents=True, exist_ok=True)
-    report = {'schema_version': 1, 'scope': 'disposable_virtual_volume_placement',
+    report = {'schema_version': 2, 'scope': 'disposable_virtual_volume_placement',
               'host': {'os': platform.mac_ver()[0], 'architecture': platform.machine()},
               'native_external_swap_verified': False, 'cloud_swap_verified': False,
               'physical_disconnect_tested': False, 'synthetic_integrity_verified': False,
@@ -205,7 +201,7 @@ def run(args):
             return result
         report['before_workload'] = snapshot(); persist()
         trace = Trace(mount, volume['DeviceIdentifier'])
-        memory_trial(probe, maximum, dict(os.environ), report, persist, snapshot, trace)
+        memory_trial(probe, maximum, dict(os.environ), report, persist, snapshot)
         report['after_verify'] = snapshot()
         report['comparison'] = evidence.compare(report['before_workload'], report['after_verify'])
         report['candidate_placement_observed'] = report['comparison'].get('candidate_placement_observed', False)

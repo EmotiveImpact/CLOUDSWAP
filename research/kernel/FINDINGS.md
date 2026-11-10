@@ -80,3 +80,21 @@ Read-only codesign inspection of the working Mac's `/sbin/dynamic_pager` found
 `com.apple.rootless.volume.VM` in its entitlements. It was not run. This does not
 prove that the entitlement controls `vm.swapfileprefix`; root capability results
 and an isolated placement experiment remain necessary.
+
+## Runtime follow-through, hosted Intel macOS 15.7.9
+
+[PR #9](https://github.com/EmotiveImpact/CLOUDSWAP/pull/9) and
+[run 42845793503](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42845793503)
+advance the earlier hypotheses. A disposable hosted Intel Mac accepted a prefix
+on a new APFS disk-image volume, created its swapfile0 there, and produced
+PgOut/PgIn trace events naming that file and device. Global counters advanced by
+896 swap-out pages and 832 swap-in pages (4 KiB pages), and the bounded workload
+verified all 8.0625 GiB. Its original prefix was restored, with the possible
+live swap volume left mounted until runner teardown.
+
+This is native kernel paging evidence for that virtual-volume configuration. It
+does not establish physical external-drive reliability, cloud filesystem swap,
+per-allocation page attribution, existing-page migration or net space savings.
+The earlier access-denied working-Mac observation remains specific to that
+restricted execution environment and did not establish that the control was
+unavailable on ordinary/root Mac sessions.

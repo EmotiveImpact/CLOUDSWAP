@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "host": {
+    "os": "Darwin",
+    "version": "15.7.9",
+    "architecture": "x86_64"
+  },
+  "synthetic_only": true,
+  "system_swap_modified": false,
+  "live_r2": false,
+  "wire": {
+    "passed": true,
+    "bytes_verified": 4194304,
+    "file_sync_acknowledgements": 64,
+    "explicit_commit": true,
+    "crash_reopen": true,
+    "mounted": false,
+    "mismatched_write_rejected": true,
+    "oversized_rpc_rejected": true,
+    "pipelined_writes_verified": 32,
+    "sha256": "9681c1544bd4595ffd307d330b21ed05a01b272b21601be90868f17a69e879e9"
+  },
+  "checkpoint": {
+    "passed": true,
+    "authenticated_rollback_rejected": true,
+    "session_stopped": true
+  },
+  "mount": {
+    "mounted": true,
+    "native_system_swap": false,
+    "live_r2": false,
+    "write": {
+      "passed": true,
+      "bytes_verified": 4194304,
+      "mmap_read_verified": true,
+      "mmap_write_and_msync": true,
+      "sha256": "192eacef3f263c1503cdf5154e2b7bcc83b15a61807b67a4b3c4e51069f4f29c"
+    },
+    "verify": {
+      "passed": true,
+      "bytes_verified": 4194304,
+      "mmap_read_verified": true,
+      "mmap_write_and_msync": false,
+      "sha256": "192eacef3f263c1503cdf5154e2b7bcc83b15a61807b67a4b3c4e51069f4f29c"
+    },
+    "pause_observation": {
+      "injected_server_pause_seconds": 1,
+      "worker_elapsed_seconds": 1.456,
+      "blocked_until_resumed": true,
+      "physical_wifi_drop": false
+    },
+    "pause": {
+      "passed": true,
+      "bytes_verified": 4194304,
+      "mmap_read_verified": true,
+      "mmap_write_and_msync": false,
+      "sha256": "192eacef3f263c1503cdf5154e2b7bcc83b15a61807b67a4b3c4e51069f4f29c"
+    },
+    "state": "passed",
+    "passed": true,
+    "remount_reopen_verified": true
+  },
+  "passed": true,
+  "evidence_source": {
+    "run_id": 42844108611,
+    "job_id": 129926827079,
+    "artifact_id": 13777068446,
+    "revision": "97d4fe13303bd9a5a67b4c19b53812fbb3d34f92",
+    "hosted_runner": true
+  }
+}

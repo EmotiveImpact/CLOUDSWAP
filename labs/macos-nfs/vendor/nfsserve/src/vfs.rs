@@ -64,6 +64,14 @@ pub enum VFSCapabilities {
     ReadWrite,
 }
 
+/// Lab-reported quotas, not an invented backing-device capacity.
+pub struct FileSystemStats {
+    pub total_bytes: u64,
+    pub available_bytes: u64,
+    pub total_files: u64,
+    pub available_files: u64,
+}
+
 /// The basic API to implement to provide an NFS file system
 ///
 /// Opaque FH
@@ -135,9 +143,17 @@ pub trait NFSFileSystem: Sync {
     /// this should return Err(nfsstat3::NFS3ERR_ROFS)
     async fn create(&self, dirid: fileid3, filename: &filename3, attr: sattr3) -> Result<(fileid3, fattr3), nfsstat3>;
 
+    /// Lab extension: keep GUARDED creation atomic in the backend.
+    async fn create_guarded(&self, dirid: fileid3, filename: &filename3, attr: sattr3)
+        -> Result<(fileid3, fattr3), nfsstat3> { self.create(dirid, filename, attr).await }
+
     /// Creates a file if it does not already exist
     /// this should return Err(nfsstat3::NFS3ERR_ROFS)
     async fn create_exclusive(&self, dirid: fileid3, filename: &filename3) -> Result<fileid3, nfsstat3>;
+
+    /// Lab extension: persist the NFS exclusive-create verifier for retries.
+    async fn create_exclusive_verified(&self, _dirid: fileid3, _filename: &filename3,
+        _verifier: createverf3) -> Result<fileid3, nfsstat3> { Err(nfsstat3::NFS3ERR_NOTSUPP) }
 
     /// Makes a directory with the following attributes.
     /// If not supported dur to readonly file system
@@ -194,6 +210,10 @@ pub trait NFSFileSystem: Sync {
 
     /// Reads a symlink
     async fn readlink(&self, id: fileid3) -> Result<nfspath3, nfsstat3>;
+
+    async fn fsstats(&self, _id: fileid3) -> Result<FileSystemStats, nfsstat3> {
+        Err(nfsstat3::NFS3ERR_NOTSUPP)
+    }
 
     /// Get static file system Information
     async fn fsinfo(&self, root_fileid: fileid3) -> Result<fsinfo3, nfsstat3> {

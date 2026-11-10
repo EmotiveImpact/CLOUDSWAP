@@ -51,6 +51,12 @@ jobs:
             --server labs/macos-nfs/target/release/cloudswap-nfs-lab \
             --helper apps/macos/.build/release/R2Lab \
             --report lab-results/mounted.json
+      - name: Sparse file creation, resize, mapped I/O and process recovery
+        run: |
+          python3 labs/macos-nfs/sparse_lab.py --ci-mount \
+            --server labs/macos-nfs/target/release/cloudswap-nfs-lab \
+            --helper apps/macos/.build/release/R2Lab \
+            --report lab-results/sparse-mounted.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

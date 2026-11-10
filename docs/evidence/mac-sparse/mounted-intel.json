@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "system_swap_modified": false,
+  "live_r2": false,
+  "host": {
+    "architecture": "x86_64",
+    "macos": "15.7.9"
+  },
+  "wire": {
+    "passed": true,
+    "sparse_size_bytes": 1073741824,
+    "payload_bytes_verified": 196608,
+    "crash_reopen": true,
+    "shrink_regrow_zeroes": true,
+    "exclusive_retry": true,
+    "rename_replacement_and_stale_handles": true,
+    "attributes_persisted": true,
+    "quota_report_not_upstream_one_tib_default": true
+  },
+  "checkpoint": {
+    "passed": true,
+    "rollback_stopped_session": true
+  },
+  "mount": {
+    "passed": true,
+    "system_swap_modified": false,
+    "live_r2": false,
+    "create": {
+      "passed": true,
+      "logical_size": 1073741824,
+      "payload_bytes_verified": 196608,
+      "mmap_verified": true,
+      "truncated_tail_zeroed": false,
+      "client_stat_allocated_bytes": 1073741824,
+      "nfs_committed_payload_bytes": 213356,
+      "backing_files": 22,
+      "backing_file_bytes": 247862,
+      "backing_allocated_bytes": 331776,
+      "backing_includes_metadata_and_retired_objects": true,
+      "backing_excludes_filesystem_directory_overhead": true
+    },
+    "verify": {
+      "passed": true,
+      "logical_size": 1073741824,
+      "payload_bytes_verified": 196608,
+      "mmap_verified": true,
+      "truncated_tail_zeroed": false,
+      "client_stat_allocated_bytes": 1073741824,
+      "nfs_committed_payload_bytes": 213356,
+      "backing_files": 22,
+      "backing_file_bytes": 247862,
+      "backing_allocated_bytes": 331776,
+      "backing_includes_metadata_and_retired_objects": true,
+      "backing_excludes_filesystem_directory_overhead": true
+    },
+    "truncate": {
+      "passed": true,
+      "logical_size": 1073741824,
+      "payload_bytes_verified": 196608,
+      "mmap_verified": true,
+      "truncated_tail_zeroed": true,
+      "client_stat_allocated_bytes": 1073741824,
+      "nfs_committed_payload_bytes": 16412,
+      "backing_files": 24,
+      "backing_file_bytes": 264215,
+      "backing_allocated_bytes": 356352,
+      "backing_includes_metadata_and_retired_objects": true,
+      "backing_excludes_filesystem_directory_overhead": true
+    },
+    "verify_truncated": {
+      "passed": true,
+      "logical_size": 1073741824,
+      "payload_bytes_verified": 196608,
+      "mmap_verified": true,
+      "truncated_tail_zeroed": true,
+      "client_stat_allocated_bytes": 1073741824,
+      "nfs_committed_payload_bytes": 16412,
+      "backing_files": 24,
+      "backing_file_bytes": 264215,
+      "backing_allocated_bytes": 356352,
+      "backing_includes_metadata_and_retired_objects": true,
+      "backing_excludes_filesystem_directory_overhead": true
+    },
+    "pause": {
+      "passed": true,
+      "logical_size": 1073741824,
+      "payload_bytes_verified": 196608,
+      "mmap_verified": true,
+      "truncated_tail_zeroed": true,
+      "client_stat_allocated_bytes": 1073741824,
+      "nfs_committed_payload_bytes": 16412,
+      "backing_files": 24,
+      "backing_file_bytes": 264215,
+      "backing_allocated_bytes": 356352,
+      "backing_includes_metadata_and_retired_objects": true,
+      "backing_excludes_filesystem_directory_overhead": true
+    },
+    "pause_observation": {
+      "server_pause_seconds": 1,
+      "blocked_until_resumed": true,
+      "worker_elapsed_seconds": 1.566,
+      "physical_wifi_drop": false
+    },
+    "fresh_mount_and_process_reopen": true
+  },
+  "passed": true
+}

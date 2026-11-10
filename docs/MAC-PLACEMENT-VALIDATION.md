@@ -49,11 +49,12 @@ The privileged experiment was never executed on the user's working Mac.
    preserve recovery/boot availability, handle future swap-file creation and
    prove application survival. Restoring the prefix does not migrate or drain
    existing pages. Never offer an eject action for a drive carrying live swap.
-2. **Cloud kernel path:** the current NFS storage bridge has a fixed 4 MiB file.
-   Implement and validate kernel-required creation, allocation, resizing and
-   flush semantics, bounded memory under pressure and a recovery strategy before
-   attempting kernel paging through it. A successful ordinary NFS mount is not
-   sufficient. R2 object/pager probes are a separate interoperability gate.
+2. **Cloud kernel path:** the original NFS mode has a fixed 4 MiB file. The
+   [growable mode](SPARSE-VOLUME.md) now implements creation, resizing and atomic
+   catalogue commits. Resolve its retained-object cap, memory residency and
+   recovery design before attempting kernel paging through it. A successful
+   ordinary NFS mount is not sufficient. R2 object/pager probes are a separate
+   interoperability gate.
 3. **Live R2:** configure the four named repository secrets and run the existing
    acceptance workflow. Its current report records missing configuration.
 4. **Physical trials:** dedicated Mac and external SSD, sustained pressure,

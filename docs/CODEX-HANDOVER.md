@@ -7,7 +7,7 @@ PR #8 (`feat/mac-integration-lab`) consolidates every change from PRs #2 through
 #7, preserving their branch ancestry. It merged into `main` at `08e3e8637cbf63b8599fe2fb6c1583d61004b903`;
 PRs #2 through #7 are also merged by ancestry.
 
-The native suite now has 57 passing XCTest tests, including loss/rollback of
+That integration checkpoint had 57 passing XCTest tests, including loss/rollback of
 an encrypted index during a session. Checkpoint reauthenticates and compares the
 persisted index before acknowledging flush. This is not rollback prevention
 across restarts without a trusted external generation counter.
@@ -40,6 +40,29 @@ PR #10 merged the [live R2 acceptance runner](LIVE-R2-ACCEPTANCE.md). Its CI
 readiness check confirmed that all four required repository secrets are absent;
 the live job correctly skipped. Configuration names, test commands and the
 recorded result are in that document. Never put credential values in the repo.
+
+## Growable storage increment
+
+PR #11 (`feat/mac-sparse-volume`) adds `SparseVolume`, `R2Lab --volume-server` and
+`cloudswap-nfs-lab --sparse-lab`: encrypted sparse files with create/resize,
+atomic multi-page mapping commits, truncate/regrow, rename/replacement and
+persistent exclusive-create verifiers. See [SPARSE-VOLUME.md](SPARSE-VOLUME.md)
+for exact limits. Objects are retained and capped, not garbage-collected; this
+is still a synthetic laboratory. The existing fixed-file mode remains tested.
+Hosted run `42855793571` passed all five growable mounted phases and the original
+fixed-file regression on Intel macOS 15.7.9 and arm64 macOS 15.8.2 at
+`9d304ea3db009731b53a4e66243cf568ca36a9e7`. The reports and source/artifact hashes
+are saved under `docs/evidence/mac-sparse`. This does not provide native system
+swap through NFS. The macOS-latest foundation job was still queued; Intel's full
+foundation checks and the Linux swap regression passed.
+
+The new native suite has 73 passing tests, including uncertain multi-page
+writes, restart, sparse holes, shrink/regrow, authenticated cross-file rejection,
+single-writer ownership, overlapping operations and bounded object exhaustion.
+The first mounted attempt caught a Darwin allocation-reporting assumption in
+the test. Actual backing-file allocation and NFS GETATTR are now checked
+separately from client `stat` output. Original failure reports are preserved in
+`docs/evidence/mac-sparse/`.
 
 ## Earlier milestones and implementation map
 
@@ -117,7 +140,7 @@ Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only 
 3. Add persisted backend settings and accurate UI states only as corresponding capabilities become verified. Full-mirror byte reporting currently excludes allocation overhead, index and orphan files; measure actual allocated bytes.
 4. On an accessible Mac, test the external-folder action and controlled unplug/replug with synthetic data. Record mount identity, errors, recovery and retained test files. Do not unplug a drive containing live application swap.
 5. Run live R2 tests once credentials and network access exist, then measure latency, request amplification and cost, throttling and failure behaviour.
-6. Continue from the now-proven disposable APFS placement, not the historical assumption that all prefix access is blocked. Next develop and review a separate physical-SSD installation/recovery design and a growable cloud storage adapter. The current 4 MiB fixed NFS file does not satisfy the kernel swap-file lifecycle. Prove each adapter and workload independently before exposing activation in the app. A block device appearing in Disk Utility is not proof of swap.
+6. Continue from the now-proven disposable APFS placement, not the historical assumption that all prefix access is blocked. Review a separate physical-SSD installation/recovery design and the new growable NFS adapter. The original 4 MiB mode lacks the required lifecycle; the new sparse mode adds it but still needs object reclamation, memory-residency design, authentication and proof of kernel page-in/page-out compatibility. Apple mlockall returns ENOSYS in the pinned source. Prove each adapter and workload independently before exposing activation in the app. A block device appearing in Disk Utility is not proof of swap.
 7. Only after isolated Mac kernel paging works, run application survival, 1/10/60-second outages, blackholes, sleep/wake, recovery and net-space trials. Do not change the user's working system swap merely to make a demonstration appear complete.
 8. Keep Cairn file offloading separate until durable file restore, keys, metadata and consent are designed.
 

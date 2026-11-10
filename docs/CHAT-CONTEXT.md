@@ -95,3 +95,17 @@ four required secrets is configured and skipped real R2 access. The source,
 research pins, reports, limitations and continuation instructions are preserved.
 The user's original goal still requires production integration, physical-drive
 trials, live R2, real app survival and net-space measurements.
+
+
+## Growable storage follow-through
+
+The next implementation adds an encrypted sparse-volume catalogue and an NFS
+file lifecycle: create, grow, partial writes, truncate/regrow, rename, replace
+and delete. It is a separate opt-in laboratory from the earlier 4 MiB file.
+Native tests reached 73, including failure during a multi-page write, restart,
+missing objects, replacement directories, cross-file ciphertext and object-budget
+exhaustion. The first mounted test exposed a Darwin `stat` allocation assumption;
+the corrected test measures actual backing files as well as NFS attributes.
+Original failed reports are retained, and final mounted results belong in
+`SPARSE-VOLUME.md` and `evidence/mac-sparse`. This does not make existing apps use
+cloud swap or establish physical external-drive safety.

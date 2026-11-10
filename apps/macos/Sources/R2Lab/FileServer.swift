@@ -18,7 +18,7 @@ private struct FileResponse: Encodable {
     var count: Int?
     var capacity: Int?
 }
-private final class FrameReader {
+final class FrameReader {
     var pending = Data()
     func next() throws -> Data? {
         while true {

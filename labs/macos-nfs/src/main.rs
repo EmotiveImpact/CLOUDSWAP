@@ -1,4 +1,5 @@
 //! Synthetic-data NFS lab. Loopback only; not a system swap service.
+mod sparse;
 use async_trait::async_trait;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use nfsserve::{
@@ -35,6 +36,9 @@ struct Bridge {
 }
 impl Bridge {
     async fn start(helper: &str, mode: &str, directory: &str) -> Result<Self> {
+        Self::start_kind(helper, mode, directory, false).await
+    }
+    async fn start_kind(helper: &str, mode: &str, directory: &str, sparse: bool) -> Result<Self> {
         if ![
             "local-create",
             "local-open",
@@ -48,7 +52,15 @@ impl Bridge {
             return Err(nfsstat3::NFS3ERR_INVAL);
         }
         let mut child = Command::new(helper)
-            .args(["--file-server", mode, directory])
+            .args([
+                if sparse {
+                    "--volume-server"
+                } else {
+                    "--file-server"
+                },
+                mode,
+                directory,
+            ])
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::null())
@@ -67,7 +79,12 @@ impl Bridge {
         let hello = tokio::time::timeout(Duration::from_secs(10), bridge.frame())
             .await
             .map_err(|_| ioerr())??;
-        if hello != json!({"id":0,"ok":true,"capacity":CAPACITY}) {
+        let expected = if sparse {
+            json!({"id":0,"ok":true,"kind":"sparse-volume-v1","capacity":sparse::CAPACITY,"maxFileSize":sparse::MAX_FILE,"maxObjects":16384})
+        } else {
+            json!({"id":0,"ok":true,"capacity":CAPACITY})
+        };
+        if hello != expected {
             return Err(ioerr());
         }
         Ok(bridge)
@@ -121,7 +138,16 @@ impl Bridge {
             }
         };
         if response["ok"] != true {
-            return Err(ioerr());
+            return Err(match response["error"].as_str() {
+                Some("EINVAL") => nfsstat3::NFS3ERR_INVAL,
+                Some("ENOENT") if request["file"].as_u64().is_some() => nfsstat3::NFS3ERR_STALE,
+                Some("ENOENT") => nfsstat3::NFS3ERR_NOENT,
+                Some("EEXIST") => nfsstat3::NFS3ERR_EXIST,
+                Some("ENOSPC") => nfsstat3::NFS3ERR_NOSPC,
+                Some("EBUSY") => nfsstat3::NFS3ERR_JUKEBOX,
+                Some("ENOTSUP") => nfsstat3::NFS3ERR_NOTSUPP,
+                _ => ioerr(),
+            });
         }
         Ok(response)
     }
@@ -305,6 +331,15 @@ impl NFSFileSystem for PageFS {
             end: true,
         })
     }
+    async fn fsstats(&self, id: fileid3) -> Result<FileSystemStats> {
+        self.getattr(id).await?;
+        Ok(FileSystemStats {
+            total_bytes: CAPACITY,
+            available_bytes: 0,
+            total_files: 1,
+            available_files: 0,
+        })
+    }
     async fn fsinfo(&self, id: fileid3) -> Result<fsinfo3> {
         Ok(fsinfo3 {
             obj_attributes: post_op_attr::attributes(self.getattr(id).await?),
@@ -361,8 +396,11 @@ async fn main() {
 }
 async fn run() -> Result<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    if args.len() != 4 || args[0] != "--synthetic-lab" {
+    if args.len() != 4 || !["--synthetic-lab", "--sparse-lab"].contains(&args[0].as_str()) {
         return Err(nfsstat3::NFS3ERR_INVAL);
+    }
+    if args[0] == "--sparse-lab" {
+        return sparse::run(&args[1], &args[2], &args[3]).await;
     }
     let bridge = Bridge::start(&args[1], &args[2], &args[3]).await?;
     let fs = PageFS {

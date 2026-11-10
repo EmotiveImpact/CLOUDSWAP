@@ -687,15 +687,24 @@ pub async fn nfsproc3_fsstat(
         Ok(v) => nfs::post_op_attr::attributes(v),
         Err(_) => nfs::post_op_attr::Void,
     };
+    let stats = match context.vfs.fsstats(id).await {
+        Ok(stats) => stats,
+        Err(status) => {
+            make_success_reply(xid).serialize(output)?;
+            status.serialize(output)?;
+            obj_attr.serialize(output)?;
+            return Ok(());
+        }
+    };
     let res = FSSTAT3resok {
         obj_attributes: obj_attr,
-        tbytes: 1024 * 1024 * 1024 * 1024,
-        fbytes: 1024 * 1024 * 1024 * 1024,
-        abytes: 1024 * 1024 * 1024 * 1024,
-        tfiles: 1024 * 1024 * 1024,
-        ffiles: 1024 * 1024 * 1024,
-        afiles: 1024 * 1024 * 1024,
-        invarsec: u32::MAX,
+        tbytes: stats.total_bytes,
+        fbytes: stats.available_bytes,
+        abytes: stats.available_bytes,
+        tfiles: stats.total_files,
+        ffiles: stats.available_files,
+        afiles: stats.available_files,
+        invarsec: 0,
     };
     make_success_reply(xid).serialize(output)?;
     nfs::nfsstat3::NFS3_OK.serialize(output)?;
@@ -1362,11 +1371,15 @@ pub async fn nfsproc3_create(
     if matches!(createhow, createmode3::EXCLUSIVE) {
         // the API for exclusive is very slightly different
         // We are not returning a post op attribute
-        fid = context.vfs.create_exclusive(dirid, &dirops.name).await;
+        let mut verifier = nfs::createverf3::default();
+        verifier.deserialize(input)?;
+        fid = context.vfs.create_exclusive_verified(dirid, &dirops.name, verifier).await;
         postopattr = nfs::post_op_attr::Void;
     } else {
         // create!
-        let res = context.vfs.create(dirid, &dirops.name, target_attributes).await;
+        let res = if matches!(createhow, createmode3::GUARDED) {
+            context.vfs.create_guarded(dirid, &dirops.name, target_attributes).await
+        } else { context.vfs.create(dirid, &dirops.name, target_attributes).await };
         fid = res.map(|x| x.0);
         postopattr = if let Ok((_, fattr)) = res {
             nfs::post_op_attr::attributes(fattr)

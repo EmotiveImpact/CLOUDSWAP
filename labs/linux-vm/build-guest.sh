@@ -12,7 +12,9 @@ install -m 755 "$lab/init" "$work/root/init"
 cc -O2 -Wall -Wextra -Werror -static "$lab/probe.c" -o "$work/root/probe"
 sudo mknod "$work/root/dev/console" c 5 1
 printf 'set -eu\n' > "$work/root/load-modules"
-modprobe --show-depends --set-version "$version" virtio_pci virtio_blk > "$work/dependencies"
+for driver in virtio_pci virtio_blk; do
+    modprobe --show-depends --set-version "$version" "$driver"
+done > "$work/dependencies"
 while read -r action module rest; do
     [[ $action == insmod ]] || continue
     name=$(basename "$module" | sed -E 's/\.(zst|xz|gz)$//')

@@ -73,3 +73,10 @@ The menu-bar app still does not redirect system swap.
 The mounted matrix now explicitly tests macOS 15 Intel and arm64. The earlier
 macOS 26 arm64 mount result remains a separate verified cohort. Additional
 queued coverage does not invalidate those recorded results or certify a new host.
+
+
+The [final placement record](MAC-PLACEMENT-VALIDATION.md) now includes successful
+Intel and arm64 schema 2 runs. These independently demonstrate paging on their
+APFS disk-image volumes. They do not turn the fixed NFS adapter into a kernel
+swap implementation. The live R2 acceptance workflow is merged and its saved
+readiness report confirms missing configuration, with the live test skipped.

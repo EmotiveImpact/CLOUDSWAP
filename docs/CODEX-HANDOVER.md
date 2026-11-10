@@ -31,8 +31,15 @@ Read [CHAT-CONTEXT.md](CHAT-CONTEXT.md), [WORK-PACKAGES.md](WORK-PACKAGES.md),
 
 The placement experiment also repeated successfully on Intel with 8.25 GiB
 verified. See [its evidence and limitations](../labs/macos-swap-placement/README.md),
-including the corrected thread-ID interpretation. Apple Silicon placement is
-not yet certified. No physical external SSD or live R2 result is implied.
+including the corrected thread-ID interpretation. Apple Silicon macOS 15.8.2
+then also observed target-volume kernel page-out/page-in, verified 3.375 GiB
+and restored its prefix. See [current placement results](MAC-PLACEMENT-VALIDATION.md).
+No physical external SSD or live R2 result is implied.
+
+PR #10 merged the [live R2 acceptance runner](LIVE-R2-ACCEPTANCE.md). Its CI
+readiness check confirmed that all four required repository secrets are absent;
+the live job correctly skipped. Configuration names, test commands and the
+recorded result are in that document. Never put credential values in the repo.
 
 ## Earlier milestones and implementation map
 
@@ -49,7 +56,7 @@ feature branches are superseded by PR #8.
 | Menu action to select an external-drive folder | Built; writes, reopens and checks 1 MiB of synthetic pages |
 | R2 signed encrypted object probe and remote pager | Implemented; live R2 interoperability not tested |
 | Full encrypted local mirror for remote pager | Library option; offline read/reopen tests pass |
-| Actual kernel paging | Proven in isolated Linux VM against loopback HTTP object service |
+| Actual kernel paging | Linux HTTP lab, plus separate APFS virtual-volume placement on hosted Intel and arm64 Macs |
 | Existing Mac apps using external/cloud swap | Not implemented |
 | Internal disk savings and app responsiveness | Not demonstrated |
 
@@ -110,7 +117,7 @@ Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only 
 3. Add persisted backend settings and accurate UI states only as corresponding capabilities become verified. Full-mirror byte reporting currently excludes allocation overhead, index and orphan files; measure actual allocated bytes.
 4. On an accessible Mac, test the external-folder action and controlled unplug/replug with synthetic data. Record mount identity, errors, recovery and retained test files. Do not unplug a drive containing live application swap.
 5. Run live R2 tests once credentials and network access exist, then measure latency, request amplification and cost, throttling and failure behaviour.
-6. First investigate the existing swapfileprefix candidate using the kernel findings and isolated-system test plan. If it fails, identify the exact blocker, then resolve the native Mac storage-adapter gate and separately prove that XNU actually selects it for swap. Original research considered SCSIControllerDriverKit software I/O; verify SDK, OS support and entitlements against current Apple sources. No adapter implementation or supported swap registration route has been demonstrated. A block device appearing in Disk Utility is not proof of swap.
+6. Continue from the now-proven disposable APFS placement, not the historical assumption that all prefix access is blocked. Next develop and review a separate physical-SSD installation/recovery design and a growable cloud storage adapter. The current 4 MiB fixed NFS file does not satisfy the kernel swap-file lifecycle. Prove each adapter and workload independently before exposing activation in the app. A block device appearing in Disk Utility is not proof of swap.
 7. Only after isolated Mac kernel paging works, run application survival, 1/10/60-second outages, blackholes, sleep/wake, recovery and net-space trials. Do not change the user's working system swap merely to make a demonstration appear complete.
 8. Keep Cairn file offloading separate until durable file restore, keys, metadata and consent are designed.
 

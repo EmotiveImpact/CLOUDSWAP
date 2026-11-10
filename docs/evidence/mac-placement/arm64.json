@@ -1,0 +1,286 @@
+{
+  "schema_version": 2,
+  "scope": "disposable_virtual_volume_placement",
+  "host": {
+    "os": "15.8.2",
+    "architecture": "arm64"
+  },
+  "native_external_swap_verified": false,
+  "cloud_swap_verified": false,
+  "physical_disconnect_tested": false,
+  "synthetic_integrity_verified": true,
+  "native_virtual_volume_paging_observed": true,
+  "candidate_placement_observed": true,
+  "prefix_changed": true,
+  "original_prefix": "/System/Volumes/VM/swapfile",
+  "initial_swap_usage": "total = 0.00M  used = 0.00M  free = 0.00M  (encrypted)",
+  "workload_limit_mib": 5120,
+  "volume": {
+    "DeviceIdentifier": "disk6s1",
+    "FilesystemType": "apfs",
+    "VolumeUUID": "C40E0A32-30B5-49BF-BF10-9959639D2E02",
+    "MountPoint": "/Volumes/CloudSwapLab-bf0ff29186"
+  },
+  "target_prefix": "/Volumes/CloudSwapLab-bf0ff29186/swapfile",
+  "retained_image": "/Users/runner/work/_temp/cloudswap-placement-owpt7va8/swap-lab.sparseimage",
+  "prefix_change_attempted": true,
+  "prefix_change_exit_code": 0,
+  "before_workload": {
+    "schema_version": 1,
+    "sample_monotonic_ns": 65981838041,
+    "target": "/Volumes/CloudSwapLab-bf0ff29186",
+    "boot_session": {
+      "state": "observed",
+      "value": "2d7f747745abbe132a011eca3823edf9fe1aa01557e3f65215817eb66f5c759e"
+    },
+    "prefix": {
+      "state": "observed",
+      "value": "/Volumes/CloudSwapLab-bf0ff29186/swapfile"
+    },
+    "prefix_matches_target": true,
+    "directory": {
+      "state": "observed",
+      "device": 16777240,
+      "inode": 2,
+      "files": [],
+      "rejected_entries": 0,
+      "allocated_bytes": 0
+    },
+    "paging": {
+      "state": "observed",
+      "page_bytes": 16384,
+      "swapins": 0,
+      "swapouts": 0
+    },
+    "native_external_swap_verified": false,
+    "collector_changed_system_swap": false,
+    "experiment_changed_system_swap": true
+  },
+  "workload_pid": 1328,
+  "bytes_touched": 3623878656,
+  "before_verify": {
+    "schema_version": 1,
+    "sample_monotonic_ns": 78302241500,
+    "target": "/Volumes/CloudSwapLab-bf0ff29186",
+    "boot_session": {
+      "state": "observed",
+      "value": "2d7f747745abbe132a011eca3823edf9fe1aa01557e3f65215817eb66f5c759e"
+    },
+    "prefix": {
+      "state": "observed",
+      "value": "/Volumes/CloudSwapLab-bf0ff29186/swapfile"
+    },
+    "prefix_matches_target": true,
+    "directory": {
+      "state": "observed",
+      "device": 16777240,
+      "inode": 2,
+      "files": [
+        {
+          "name": "swapfile0",
+          "inode": 16,
+          "device": 16777240,
+          "logical_bytes": 1073741824,
+          "allocated_bytes": 1073741824
+        }
+      ],
+      "rejected_entries": 0,
+      "allocated_bytes": 1073741824
+    },
+    "paging": {
+      "state": "observed",
+      "page_bytes": 16384,
+      "swapins": 4,
+      "swapouts": 192
+    },
+    "native_external_swap_verified": false,
+    "collector_changed_system_swap": false,
+    "experiment_changed_system_swap": true
+  },
+  "memory_events": [
+    {
+      "event": "ready",
+      "bytes": 3623878656,
+      "counters_available": true,
+      "swapouts_delta": 84
+    },
+    {
+      "event": "verified",
+      "bytes": 3623878656,
+      "counters_available": true,
+      "swapins_delta": 0
+    }
+  ],
+  "after_verify": {
+    "schema_version": 1,
+    "sample_monotonic_ns": 84420293333,
+    "target": "/Volumes/CloudSwapLab-bf0ff29186",
+    "boot_session": {
+      "state": "observed",
+      "value": "2d7f747745abbe132a011eca3823edf9fe1aa01557e3f65215817eb66f5c759e"
+    },
+    "prefix": {
+      "state": "observed",
+      "value": "/Volumes/CloudSwapLab-bf0ff29186/swapfile"
+    },
+    "prefix_matches_target": true,
+    "directory": {
+      "state": "observed",
+      "device": 16777240,
+      "inode": 2,
+      "files": [
+        {
+          "name": "swapfile0",
+          "inode": 16,
+          "device": 16777240,
+          "logical_bytes": 1073741824,
+          "allocated_bytes": 1073741824
+        }
+      ],
+      "rejected_entries": 0,
+      "allocated_bytes": 1073741824
+    },
+    "paging": {
+      "state": "observed",
+      "page_bytes": 16384,
+      "swapins": 4,
+      "swapouts": 348
+    },
+    "native_external_swap_verified": false,
+    "collector_changed_system_swap": false,
+    "experiment_changed_system_swap": true
+  },
+  "comparison": {
+    "state": "observed",
+    "paging_page_delta": {
+      "swapins": 4,
+      "swapouts": 348
+    },
+    "new_file_names": [
+      "swapfile0"
+    ],
+    "target_allocated_byte_delta": 1073741824,
+    "candidate_placement_observed": true,
+    "native_external_swap_verified": false,
+    "limitation": "System-wide counters and file metadata cannot attribute page I/O to this volume or prove it is external. Target I/O traces and workload integrity evidence remain required."
+  },
+  "final_swap_usage": "total = 1024.00M  used = 5.44M  free = 1018.56M  (encrypted)",
+  "state": "candidate_observed",
+  "target_io_trace": {
+    "exit_code": 0,
+    "target_lines": [
+      "15:55:38.476172    PgOut[AP]       D=0x000014f3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.000754 W kernel_task.438",
+      "15:55:38.497682    PgOut[AP]       D=0x00001503  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.021879 W kernel_task.438",
+      "15:55:38.499883    PgOut[AP]       D=0x00001513  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.023933 W kernel_task.438",
+      "15:55:38.507042    PgOut[AP]       D=0x00001523  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.030960 W kernel_task.438",
+      "15:55:38.515377    PgOut[AP]       D=0x00001533  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.037996 W kernel_task.438",
+      "15:55:38.518284    PgOut[AP]       D=0x00001543  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.020514 W kernel_task.438",
+      "15:55:38.540781    PgOut[AP]       D=0x00001553  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.040554 W kernel_task.438",
+      "15:55:38.547246    PgOut[AP]       D=0x00001563  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.039887 W kernel_task.438",
+      "15:55:38.554627    PgOut[AP]       D=0x00001573  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.038179 W kernel_task.438",
+      "15:55:38.555806    PgOut[AP]       D=0x00001583  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.037435 W kernel_task.438",
+      "15:55:38.557773    PgOut[AP]       D=0x00001593  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.016711 W kernel_task.438",
+      "15:55:38.581537    PgOut[AP]       D=0x000015a3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.033538 W kernel_task.438",
+      "15:55:38.589928    PgOut[AP]       D=0x000015b3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.035093 W kernel_task.438",
+      "15:55:38.592189    PgOut[AP]       D=0x000015c3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.036303 W kernel_task.438",
+      "15:55:38.593936    PgOut[AP]       D=0x000015d3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.035330 W kernel_task.438",
+      "15:55:38.596946    PgOut[AP]       D=0x000015e3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.015306 W kernel_task.438",
+      "15:55:38.604257    PgOut[AP]       D=0x000015f3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.014242 W kernel_task.438",
+      "15:55:38.606334    PgOut[AP]       D=0x00001603  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.014042 W kernel_task.438",
+      "15:55:38.610195    PgOut[AP]       D=0x00001613  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.016179 W kernel_task.438",
+      "15:55:38.611296    PgOut[AP]       D=0x00001623  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.013808 W kernel_task.438",
+      "15:55:38.636246    PgOut[AP]       D=0x00001633  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.031899 W kernel_task.438",
+      "15:55:38.664846    PgOut[AP]       D=0x00001643  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.058441 W kernel_task.438",
+      "15:55:38.682919    PgOut[AP]       D=0x00001653  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.072552 W kernel_task.438",
+      "15:55:38.684020    PgOut[AP]       D=0x00001663  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.072618 W kernel_task.438",
+      "15:55:38.685549    PgOut[AP]       D=0x00001673  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.049209 W kernel_task.438",
+      "15:55:38.688083    PgOut[AP]       D=0x00001683  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.020957 W kernel_task.438",
+      "15:55:38.689479    PgOut[AP]       D=0x00001693  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.005557 W kernel_task.438",
+      "15:55:38.692026    PgOut[AP]       D=0x000016a3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.007931 W kernel_task.438",
+      "15:55:38.692824    PgOut[AP]       D=0x000016b3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.007104 W kernel_task.438",
+      "15:55:38.693179    PgOut[AP]       D=0x000016c3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.004735 W kernel_task.438",
+      "15:55:38.693476    PgOut[AP]       D=0x000016d3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.003662 W kernel_task.438",
+      "15:55:38.702351    PgOut[AP]       D=0x000016e3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.010246 W kernel_task.438",
+      "15:55:38.704692    PgOut[AP]       D=0x000016f3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.008966 W kernel_task.438",
+      "15:55:38.711901    PgOut[AP]       D=0x00001703  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.015827 W kernel_task.438",
+      "15:55:38.713712    PgOut[AP]       D=0x00001713  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.017273 W kernel_task.438",
+      "15:55:38.714437    PgOut[AP]       D=0x00001723  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.012005 W kernel_task.438",
+      "15:55:38.716191    PgOut[AP]       D=0x00001733  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.010174 W kernel_task.438",
+      "15:55:38.717043    PgIn[ST1]       D=0x00001613  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006266 W logd.6817",
+      "15:55:38.718512    PgOut[AP]       D=0x00001743  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006492 W kernel_task.438",
+      "15:55:38.720750    PgOut[AP]       D=0x00001753  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006628 W kernel_task.438",
+      "15:55:38.721441    PgOut[AP]       D=0x00001763  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006453 W kernel_task.438",
+      "15:55:38.722836    PgOut[AP]       D=0x00001773  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006485 W kernel_task.438",
+      "15:55:38.726100    PgOut[AP]       D=0x00001783  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.007492 W kernel_task.438",
+      "15:55:38.726944    PgOut[AP]       D=0x00001793  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006002 W kernel_task.438",
+      "15:55:38.727962    PgOut[AP]       D=0x000017a3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006453 W kernel_task.438",
+      "15:55:38.729570    PgOut[AP]       D=0x000017b3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006307 W kernel_task.438",
+      "15:55:38.730360    PgOut[AP]       D=0x000017c3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.004155 W kernel_task.438",
+      "15:55:38.732952    PgOut[AP]       D=0x000017d3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.005941 W kernel_task.438",
+      "15:55:38.734180    PgOut[AP]       D=0x000017e3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.006140 W kernel_task.438",
+      "15:55:38.735478    PgOut[AP]       D=0x000017f3  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.005725 W kernel_task.438",
+      "15:55:38.737654    PgOut[AP]       D=0x00001803  B=0x10000  /dev/disk6s1  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                      0.007209 W kernel_task.438"
+    ],
+    "target_metadata_lines": [
+      "15:55:30.494853  open              F=30       (R_____N___V___)  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186                                                                                                          0.000053   mds.6525",
+      "15:55:34.578756  open              F=30       (R_____N___V___)  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186                                                                                                          0.000066   mds.6525",
+      "15:55:34.578831  open              F=30       (R_____N___V___)  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186                                                                                                          0.000023   mds.6525",
+      "15:55:34.579050  open              F=30       (R_____N___V___)  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186                                                                                                          0.000022   mds.6525",
+      "15:55:34.579076  open              F=30       (R_____N___V___)  /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186                                                                                                          0.000015   mds.6525",
+      "15:55:34.580756  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000038   Finder.2126",
+      "15:55:34.580762  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000004   Finder.2126",
+      "15:55:38.452094  lstat64                                /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186                                                                                                                  0.000018   fseventsd.2041",
+      "15:55:38.475382  lstat64                                /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186/swapfile0                                                                                                        0.023724   fseventsd.2617",
+      "15:55:38.508643  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000042   Finder.2126",
+      "15:55:38.509006  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000011   Finder.2126",
+      "15:55:38.509196  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000188   Finder.2126",
+      "15:55:38.509406  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000007   Finder.2126",
+      "15:55:38.535075  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000012   Finder.2126",
+      "15:55:38.535085  statfs64                               /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000009   Finder.2126",
+      "15:55:38.535093  lstat64                                /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000007   Finder.2126",
+      "15:55:38.549109  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000018   Finder.2126",
+      "15:55:38.549150  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000040   Finder.2126",
+      "15:55:38.549160  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000002   Finder.2126",
+      "15:55:38.556383  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000016   Finder.2126",
+      "15:55:38.556413  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000028   Finder.2126",
+      "15:55:38.603145  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000016   Finder.2126",
+      "15:55:38.604202  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000008   Finder.2126",
+      "15:55:38.606059  open                   [  2] (R_____________)  /Volumes/CloudSwapLab-bf0ff29186/.hidden                                                                                                                      0.000022   Finder.2126",
+      "15:55:38.606171  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000006   Finder.2126",
+      "15:55:38.606257  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000013   Finder.2126",
+      "15:55:38.736444  lstat64                                /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000015   Python.6276",
+      "15:55:38.736467  lstat64                                /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000002   Python.6276",
+      "15:55:38.736826  open              F=7        (R_______F__X__)  /Volumes/CloudSwapLab-bf0ff29186                                                                                                                              0.000032   Python.6276",
+      "15:55:38.737955  lstat64                                /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000005   Python.6276",
+      "15:55:38.953400  lstat64                                /System/Volumes/Data/Volumes/CloudSwapLab-bf0ff29186                                                                                                                  0.000067   fseventsd.2041",
+      "15:55:38.954371  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000047   Finder.6800",
+      "15:55:38.954457  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000013   Finder.6800",
+      "15:55:38.954531  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000072   Finder.6800",
+      "15:55:38.954542  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000004   Finder.6800",
+      "15:55:38.954724  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000009   Finder.6800",
+      "15:55:38.954730  statfs64                               /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000007   Finder.6800",
+      "15:55:38.954734  lstat64                                /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000003   Finder.6800",
+      "15:55:38.954954  fsgetpath                              /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000008   Finder.6800",
+      "15:55:38.954968  getattrlist                            /Volumes/CloudSwapLab-bf0ff29186                                                                                                                                      0.000013   Finder.6800"
+    ],
+    "target_pageout_lines": 50,
+    "target_pagein_lines": 1,
+    "observed_page_io_bytes": {
+      "in": 65536,
+      "out": 3276800
+    },
+    "workload_page_attribution": "not_established",
+    "page_line_limit": 200,
+    "metadata_line_limit": 40,
+    "limitation": "Observed trace events only; counts do not establish complete tracing or identify which allocation faulted."
+  },
+  "prefix_restored": true,
+  "volume_left_mounted_until_runner_teardown": true,
+  "provenance": {
+    "run_id": 42849385474,
+    "job_id": 129945515439,
+    "revision": "6db50c1198b00cfbca5c95667a254408b92eb8a9",
+    "artifact_id": 13780525155,
+    "artifact_sha256": "d4bb0f0bc3efa824736c6389ae6d5d6e44e3297b69af2f31944123fd9ee1d2be"
+  }
+}

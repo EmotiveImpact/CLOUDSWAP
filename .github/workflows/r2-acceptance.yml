@@ -1,0 +1,59 @@
+name: Live R2 synthetic acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-acceptance.yml'
+      - 'scripts/r2-acceptance.py'
+      - 'apps/macos/Sources/R2Lab/**'
+      - 'apps/macos/Sources/PagingStore/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      configured: ${{ steps.configuration.outputs.configured }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s scripts/tests -p test_r2_acceptance.py -v
+      - id: configuration
+        name: Record whether live R2 configuration is available
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python3 scripts/r2-acceptance.py --readiness-only --report r2-results/readiness.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r2-readiness
+          path: r2-results/
+  live:
+    needs: readiness
+    if: needs.readiness.outputs.configured == 'true'
+    runs-on: macos-15-intel
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build the native R2 helper
+        run: swift build -c release --package-path apps/macos --product R2Lab
+      - name: Encrypted object and pager reopen verification
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python3 scripts/r2-acceptance.py --helper apps/macos/.build/release/R2Lab --report r2-results/live.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r2-live
+          path: r2-results/

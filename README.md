@@ -4,7 +4,7 @@ Research towards cloud-backed swap for existing macOS applications, with a nativ
 
 **The menu-bar app does not redirect macOS swap or demonstrate reclaimed disk space.** It provides a native Mac menu-bar app, encrypted local/external storage, an R2 pager and optional full local mirror. Actual Linux kernel paging and controlled disconnects are verified against a loopback HTTP object service. Live R2, physical drive/Wi-Fi tests and native Mac external/cloud swap attachment remain unverified.
 
-**Continuing in Codex? Start with [CODEX-HANDOVER.md](docs/CODEX-HANDOVER.md) and [CHAT-CONTEXT.md](docs/CHAT-CONTEXT.md).** PR #8 consolidates the subsequent research, storage integrity, tiered trial and native file adapters on `feat/mac-integration-lab`. Check its merge state before choosing a checkout. The menu-bar foundation is already on `main`.
+**Continuing in Codex? Start with [CODEX-HANDOVER.md](docs/CODEX-HANDOVER.md) and [CHAT-CONTEXT.md](docs/CHAT-CONTEXT.md).** PR #8 merged the research, storage integrity, tiered trial and native file adapters into `main`. PR #10 added live R2 acceptance. [Current Mac placement evidence](docs/MAC-PLACEMENT-VALIDATION.md) records the separately guarded experiment in PR #9.
 
 ## Build on a Mac
 
@@ -45,7 +45,7 @@ Cairn may later reuse cloud storage and retrieval components for file offloading
 
 ## Kernel research and multiple Macs
 
-Pinned XNU, ipsw and symbolicator source checkouts are included as Git submodules. Run `git submodule update --init --depth 1 -- research/kernel-sources` to fetch them. Read the [kernel source findings](research/kernel/FINDINGS.md) and [multi-Mac test plan](docs/MULTI-MAC-TEST-PLAN.md). The `vm.swapfileprefix` control has now been exercised on a disposable hosted Intel Mac, with separate APFS virtual-volume paging evidence in PR #9. No change was made to the working Mac's swap configuration. `python3 scripts/mac-capabilities.py` collects a read-only report for each test Mac.
+Pinned XNU, ipsw and symbolicator source checkouts are included as Git submodules. Run `git submodule update --init --depth 1 -- research/kernel-sources` to fetch them. Read the [kernel source findings](research/kernel/FINDINGS.md) and [multi-Mac test plan](docs/MULTI-MAC-TEST-PLAN.md). The `vm.swapfileprefix` control has now been exercised on disposable hosted Intel and Apple Silicon Macs, with actual separate APFS virtual-volume page-out/page-in evidence in PR #9. No change was made to the working Mac's swap configuration. `python3 scripts/mac-capabilities.py` collects a read-only report for each test Mac.
 
 The [expanded disaggregated-memory collection](research/disaggregation/README.md) pins 23 upstream repositories and records their relevance, platform dependencies and reuse experiments. Download these selectively to avoid filling your Mac with upstream kernel trees.
 
@@ -74,5 +74,7 @@ constitutes native system-swap attachment.
 The [integration validation](docs/INTEGRATION-VALIDATION.md) now records actual
 Mac NFS mounts and one-second server-pause recovery on Intel and Apple Silicon.
 [PR #9](https://github.com/EmotiveImpact/CLOUDSWAP/pull/9) adds a separately guarded
-native kernel placement experiment, with initial Intel APFS virtual-volume
-paging evidence. Physical SSD and live R2 acceptance remain separate gates.
+native kernel placement experiment with Intel and Apple Silicon APFS
+virtual-volume paging evidence. Physical SSD and live R2 acceptance remain
+separate gates. The [R2 acceptance workflow](docs/LIVE-R2-ACCEPTANCE.md) recorded
+missing configuration and correctly skipped the live test.

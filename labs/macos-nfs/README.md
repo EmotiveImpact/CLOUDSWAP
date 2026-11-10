@@ -6,7 +6,7 @@ FUSE adapter. No third-party filesystem runtime, kernel extension or system swap
 configuration is needed for this file test. This is a laboratory, not a system
 swap service or a production network export.
 
-The loopback wire test passes locally: 64 FILE_SYNC writes, explicit COMMIT,
+The loopback wire test passes locally: 64 FILE_SYNC writes (32 pipelined), explicit COMMIT,
 server/helper process-group death and a full 4 MiB recovery from a fresh process.
 Actual mounting is tested separately in the `Mounted Mac storage lab` workflow
 on disposable Intel and arm64 Mac runners. Consult its result rather than
@@ -26,7 +26,10 @@ python3 labs/macos-nfs/lab.py \
 
 Adding `--mount` attempts an actual mount using `/sbin/mount_nfs`, writes via the
 mounted path, calls fsync, unmounts, restarts the server/helper, remounts and
-verifies the entire file again. The test never configures system swap. `--ci`
+verifies the entire file again, including mmap reads. A further fresh mount
+pauses the server/helper for one second and requires a cold read to block then
+recover intact. This is a server pause, not a physical Wi-Fi test. The test never
+configures system swap. `--ci`
 permits passwordless sudo for mount/unmount only and is restricted to
 GitHub-hosted disposable runners. Normal local execution never requests sudo.
 A denied or failed mount is a failed test, not a simulated pass.
@@ -47,15 +50,16 @@ this NFS lab. Do not export an existing directory containing personal data.
 - `pages` is the only file. Fixed capacity; 64 KiB request maximum; no namespace,
   size, ownership or permission mutations. Virtual capacity is not disk savings.
 - Native writes finish their page/index commits and a checkpoint before NFS
-  reports FILE_SYNC. Explicit COMMIT calls the native checkpoint. There is no
-  deferred dirty-data queue. Multi-page writes remain non-atomic, and physical
+  reports FILE_SYNC. Explicit COMMIT calls the native checkpoint. Checkpoint authenticates the persisted index and compares it with the current
+  session. Loss or rollback stops the session. There is no deferred dirty-data queue. Multi-page writes remain non-atomic, and physical
   power-loss durability remains unproved.
 - Helper IPC has a bounded frame and deadline. Uncertain writes stop the helper
   session. NFS file handles change after server restart; the test unmounts and
   remounts explicitly. It does not pretend transparent recovery of open handles.
 - The pinned NFS implementation has local hardening: bounded RPC/XDR lengths,
   eight connections, serial processing per connection and a bounded reply queue,
-  request-count validation, and explicit COMMIT support. See `UPSTREAM.json`.
+  request-count validation, explicit COMMIT support and independent bounded TCP
+  receive/reply flows to avoid pipelined-write deadlocks. See `UPSTREAM.json`.
 - Client caching can affect reads. The acceptance test requires a clean unmount
   and fresh process/remount before its full-file verification. A warm cached read
   alone does not establish cloud availability or on-disk recovery.

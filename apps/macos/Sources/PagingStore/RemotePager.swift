@@ -93,7 +93,12 @@ public actor RemotePager {
     public func checkpoint() throws {
         guard !poisoned else { throw PagingError.poisoned }
         guard !busy else { throw PagingError.busy }
-        do { try storage.validate() } catch { poisoned = true; throw error }
+        do {
+            let bytes = try storage.read("remote-index.enc")
+            let plain = try AES.GCM.open(AES.GCM.SealedBox(combined: bytes), using: key, authenticating: Self.aad)
+            let persisted = try JSONDecoder().decode([String: String].self, from: plain)
+            guard persisted == index else { throw PagingError.invalid }
+        } catch { poisoned = true; throw error }
     }
     public func read(block: Int) async throws -> Data {
         try begin(block); defer { busy = false }

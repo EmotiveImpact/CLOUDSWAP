@@ -8,6 +8,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: mounted-lab-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   mounted:
     strategy:
@@ -31,6 +34,11 @@ jobs:
           mkdir -p lab-results
           python3 scripts/mac-capabilities.py > lab-results/capabilities-user.json
           sudo -n python3 scripts/mac-capabilities.py > lab-results/capabilities-root.json
+          cat lab-results/capabilities-root.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capabilities-${{ matrix.runner }}
+          path: lab-results/capabilities-*.json
       - name: Actual mount, fsync, unmount and fresh-process reopen
         run: |
           python3 labs/macos-nfs/lab.py --ci --mount \

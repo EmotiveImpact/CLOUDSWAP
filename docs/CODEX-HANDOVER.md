@@ -1,14 +1,34 @@
 # Codex handover
 Updated 10 November 2026. Read this before continuing CLOUDSWAP.
 
-## Checkout and source of truth
-- Repository: https://github.com/EmotiveImpact/CLOUDSWAP
-- Integration branch: `main` (PR #1 merged on 10 November 2026).
-- Merged PR: https://github.com/EmotiveImpact/CLOUDSWAP/pull/1
-- Last tested implementation commit: `dc57860314fb3a16468fd23258770610f6e111ad`.
-- PR #1 merged at `7baee59f386abfb391cd6a377228a4034880da18`. All three CI workflows passed on its final head `1448df929e44dadabfe5dfa5c0464eb7eed95665`. Start new work from current `main`, inspect the working tree, and use a new feature branch.
-- Read [chat context](CHAT-CONTEXT.md), [external storage](EXTERNAL-STORAGE.md), [validation](VALIDATION.md), [work packages](WORK-PACKAGES.md) and [research](../research/RESEARCH.md).
-- The original session's local checkout was behind the remote branch, with tracked edits and untracked Linux lab files. Prefer a fresh checkout of remote main. Preserve local changes if reusing that checkout.
+## Current integration checkpoint
+
+PR #8 (`feat/mac-integration-lab`) consolidates every change from PRs #2 through
+#7, preserving their branch ancestry. This is the continuation branch until it
+is merged. Inspect GitHub before assuming any draft change is on `main`.
+
+The native suite now has 57 passing XCTest tests, including loss/rollback of
+an encrypted index during a session. Checkpoint reauthenticates and compares the
+persisted index before acknowledging flush. This is not rollback prevention
+across restarts without a trusted external generation counter.
+
+`labs/macos-nfs` adds a Rust NFSv3 bridge using the same Swift encrypted helper.
+Its wire test covers 4 MiB, pipelined FILE_SYNC writes, explicit COMMIT, process
+death/reopen, malformed requests and fail-stop on authenticated index rollback.
+The Mac mounted workflow separately tests actual mount, fsync, remount, mmap
+reads and a one-second server pause on Intel and arm64 hosted Macs. Check its
+latest result; wire success does not imply mount success.
+
+No working-Mac swap configuration has been changed. Native macOS system swap,
+physical external-drive unplug, live R2 and internal disk savings remain
+unverified. The prototype is not ready to carry private live application memory.
+Read [CHAT-CONTEXT.md](CHAT-CONTEXT.md), [WORK-PACKAGES.md](WORK-PACKAGES.md),
+[the NFS lab](../labs/macos-nfs/README.md) and the dated validation records.
+
+## Earlier milestones and implementation map
+
+The records below describe successive earlier milestones. Test counts are
+historical, and references to separate feature branches are superseded by PR #8.
 
 ## What works, precisely
 | Capability | Status |
@@ -106,8 +126,7 @@ See [TIERED-STORAGE-TRIAL.md](TIERED-STORAGE-TRIAL.md). The menu now includes a 
 Branch `feat/fuse-file-adapter` adds an executable FUSE frontend, a bounded
 stdin/stdout server in R2Lab and `VirtualPageFile` over the local, remote and
 mirrored encrypted stores. Read [the adapter instructions](../labs/macos-fuse/README.md)
-for exact commands, key handling, storage contract and remaining gates. This is
-separate from PR #5's tiered trial and does not depend on that unmerged branch.
+for exact commands, key handling, storage contract and remaining gates. The adapter and PR #5's tiered trial are now combined in PR #8.
 
 The actual filesystem callbacks and helper-process restart are tested without a
 mount. The current Mac has no FUSE runtime, so mounting and compatibility of the

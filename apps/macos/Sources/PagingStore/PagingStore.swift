@@ -74,7 +74,12 @@ public final class PagingStore {
     public func checkpoint() throws {
         mutex.lock(); defer { mutex.unlock() }
         guard !poisoned else { throw PagingError.poisoned }
-        do { try storage.validate() } catch { poisoned = true; throw error }
+        do {
+            let bytes = try storage.read("index.enc")
+            let plain = try AES.GCM.open(AES.GCM.SealedBox(combined: bytes), using: key, authenticating: Self.indexAAD)
+            let persisted = try JSONDecoder().decode([String: String].self, from: plain)
+            guard persisted == index else { throw PagingError.invalid }
+        } catch { poisoned = true; throw error }
     }
     public func read(block: Int) throws -> Data {
         mutex.lock(); defer { mutex.unlock() }

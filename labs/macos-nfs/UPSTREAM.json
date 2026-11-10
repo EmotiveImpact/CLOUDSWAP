@@ -9,7 +9,8 @@
     "Eight accepted connections and serial RPC processing per connection",
     "Two-entry reply queue",
     "NFS WRITE count validation",
-    "NFS COMMIT invokes a backend checkpoint"
+    "NFS COMMIT invokes a backend checkpoint",
+    "Independent bounded TCP receive, processing and reply flows prevent pipelined-write deadlock"
   ],
   "files": {
     "Cargo.toml": {
@@ -70,11 +71,11 @@
     },
     "src/rpcwire.rs": {
       "original_sha256": "d8b4df58950c602b832ee3c07f3c4de478407ae0c6ddbda7fdc67358010ff012",
-      "vendored_sha256": "0e36342dcb1530756d092fcf9d13405d7f1c8ef194760045301f26b445cc6d13"
+      "vendored_sha256": "d1021b291520fec119f0fa74a1f042b2308056bb5003995162793a3c947e0923"
     },
     "src/tcp.rs": {
       "original_sha256": "1206c94a35e11d701a29f4f47d997af3ee5587174fefdbe786589ab7a5f95856",
-      "vendored_sha256": "045c9d5d6feee78210bb335a3a85fad384fcb33c001645a77679a19c7e059a2f"
+      "vendored_sha256": "a23dbc4fdd72a27dcc888df8ff7cb62f51c74134e6551b5024c706452ade81a3"
     },
     "src/transaction_tracker.rs": {
       "original_sha256": "91ed917eeb351a38471414dfa69cc611d45c8b41643e2db13396e9944f0f1a21",

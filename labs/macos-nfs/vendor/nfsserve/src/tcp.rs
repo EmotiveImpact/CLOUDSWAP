@@ -5,10 +5,10 @@ use std::time::Duration;
 
 use anyhow;
 use async_trait::async_trait;
-use tokio::io::AsyncWriteExt;
+use tokio::io::copy;
 use tokio::net::TcpListener;
 use tokio::sync::{mpsc, Semaphore};
-use tracing::{debug, error, info};
+use tracing::{debug, info};
 
 use crate::context::RPCContext;
 use crate::rpcwire::*;
@@ -30,58 +30,22 @@ pub fn generate_host_ip(hostnum: u16) -> String {
 }
 
 /// processes an established socket
-async fn process_socket(mut socket: tokio::net::TcpStream, context: RPCContext) -> Result<(), anyhow::Error> {
-    let (mut message_handler, mut socksend, mut msgrecvchan) = SocketMessageHandler::new(&context);
-    let _ = socket.set_nodelay(true);
-
-    tokio::spawn(async move {
-        loop {
-            if let Err(e) = message_handler.read().await {
-                debug!("Message loop broken due to {:?}", e);
-                break;
-            }
+async fn process_socket(socket: tokio::net::TcpStream, context: RPCContext) -> Result<(), anyhow::Error> {
+    let (mut handler, mut input, mut replies) = SocketMessageHandler::new(&context);
+    socket.set_nodelay(true)?;
+    let (mut reader, mut writer) = socket.into_split();
+    // Independent bounded flows prevent pipelined client writes from blocking
+    // the reply drain while the parser is waiting for room in its reply queue.
+    let receive = async { copy(&mut reader, &mut input).await?; Ok::<(), anyhow::Error>(()) };
+    let process = async { loop { handler.read().await?; } #[allow(unreachable_code)] Ok::<(), anyhow::Error>(()) };
+    let reply = async {
+        while let Some(message) = replies.recv().await {
+            write_fragment(&mut writer, &message?).await?;
         }
-    });
-    loop {
-        tokio::select! {
-            _ = socket.readable() => {
-                let mut buf = [0; 128000];
-
-                match socket.try_read(&mut buf) {
-                    Ok(0) => {
-                        return Ok(());
-                    }
-                    Ok(n) => {
-                        let _ = socksend.write_all(&buf[..n]).await;
-                    }
-                    Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
-                        continue;
-                    }
-                    Err(e) => {
-                        debug!("Message handling closed : {:?}", e);
-                        return Err(e.into());
-                    }
-                }
-
-            },
-            reply = msgrecvchan.recv() => {
-                match reply {
-                    Some(Err(e)) => {
-                        debug!("Message handling closed : {:?}", e);
-                        return Err(e);
-                    }
-                    Some(Ok(msg)) => {
-                        if let Err(e) = write_fragment(&mut socket, &msg).await {
-                            error!("Write error {:?}", e);
-                        }
-                    }
-                    None => {
-                        return Err(anyhow::anyhow!("Unexpected socket context termination"));
-                    }
-                }
-            }
-        }
-    }
+        Ok::<(), anyhow::Error>(())
+    };
+    // Dropping the other futures closes their halves; no detached per-connection tasks.
+    tokio::select! { result = receive => result, result = process => result, result = reply => result }
 }
 
 #[async_trait]

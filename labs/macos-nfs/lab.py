@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """Synthetic-data NFS acceptance: real wire protocol, optional actual Mac mount."""
 import argparse
-import base64
 import hashlib
 import json
+import mmap
 import os
 from pathlib import Path
 import platform
-import random
 import secrets
 import select
 import shutil
@@ -63,6 +62,8 @@ class NFSClient:
         self.xid += 1
         request = b''.join(u32(x) for x in [self.xid, 0, 2, program, 3, procedure, 0, 0, 0, 0]) + body
         self.socket.sendall(u32(0x80000000 | len(request)) + request)
+        return self.response(self.xid)
+    def response(self, xid):
         data = bytearray()
         for _ in range(16):
             header = struct.unpack('>I', self.exact(4))[0]
@@ -72,7 +73,7 @@ class NFSClient:
             if header & 0x80000000: break
         else: raise ValueError('Too many NFS fragments')
         response = XDR(bytes(data))
-        if response.uint() != self.xid or response.uint() != 1 or response.uint() != 0: raise ValueError('Bad RPC response')
+        if response.uint() != xid or response.uint() != 1 or response.uint() != 0: raise ValueError('Bad RPC response')
         response.uint(); response.opaque()
         if response.uint() != 0: raise OSError('RPC request rejected')
         return response
@@ -93,10 +94,23 @@ class NFSClient:
         return data, bool(eof)
     def write(self, handle, offset, data):
         response = self.call(100003, 7, opaque(handle) + struct.pack('>QII', offset, len(data), 2) + opaque(data))
+        return self.write_response(response, len(data))
+    def write_response(self, response, length):
         if response.uint(): raise OSError('NFS write failed')
         response.wcc()
-        if response.uint() != len(data) or response.uint() != 2: raise ValueError('NFS write was not FILE_SYNC')
+        if response.uint() != length or response.uint() != 2: raise ValueError('NFS write was not FILE_SYNC')
         return response.take(8)
+    def pipelined_writes(self, handle, data):
+        ids = []
+        # Exceeds the server's input pipe while replies are pending. This catches
+        # a bounded-queue deadlock that sequential clients cannot expose.
+        for offset in range(0, len(data), CHUNK):
+            self.xid += 1; ids.append(self.xid)
+            part = data[offset:offset + CHUNK]
+            body = opaque(handle) + struct.pack('>QII', offset, len(part), 2) + opaque(part)
+            request = b''.join(u32(x) for x in [self.xid, 0, 2, 100003, 3, 7, 0, 0, 0, 0]) + body
+            self.socket.sendall(u32(0x80000000 | len(request)) + request)
+        for xid in ids: self.write_response(self.response(xid), CHUNK)
     def commit(self, handle):
         response = self.call(100003, 21, opaque(handle) + struct.pack('>QI', 0, 0))
         if response.uint(): raise OSError('NFS COMMIT failed')
@@ -135,6 +149,35 @@ def expected_data():
     return hashlib.shake_256(b'CLOUDSWAP synthetic NFS acceptance v1').digest(CAPACITY)
 
 
+def mounted_data():
+    data = bytearray(expected_data())
+    data[16380:16420] = bytes(x ^ 0xff for x in data[16380:16420])
+    return bytes(data)
+
+
+def checkpoint_trial(binary, helper, root, env):
+    directory = root / 'checkpoint-store'
+    server = Server(binary, helper, 'local-create', directory, env)
+    client = None
+    try:
+        client = NFSClient(server.port); handle = client.handle()
+        client.write(handle, 0, b'first')
+        index = directory / 'index.enc'
+        previous = index.read_bytes()
+        client.write(handle, 0, b'newer')
+        index.write_bytes(previous)
+        try: client.commit(handle)
+        except OSError: pass
+        else: raise ValueError('COMMIT acknowledged an index rollback')
+        try: client.read(handle, 0, 5)
+        except OSError: pass
+        else: raise ValueError('Poisoned session continued serving pages')
+        return {'passed': True, 'authenticated_rollback_rejected': True, 'session_stopped': True}
+    finally:
+        if client: client.close()
+        server.stop()
+
+
 def wire_trial(binary, helper, root, env):
     server = Server(binary, helper, 'local-create', root / 'wire-store', env)
     client = None
@@ -143,7 +186,8 @@ def wire_trial(binary, helper, root, env):
         client = NFSClient(server.port)
         handle = client.handle()
         if client.read(handle, 0, 20)[0] != bytes(20): raise ValueError('Unwritten page is not zero')
-        for position in range(0, CAPACITY, CHUNK): client.write(handle, position, expected[position:position + CHUNK])
+        client.pipelined_writes(handle, expected[:CAPACITY // 2])
+        for position in range(CAPACITY // 2, CAPACITY, CHUNK): client.write(handle, position, expected[position:position + CHUNK])
         client.commit(handle)
         client.close(); client = None
         server.stop(crash=True)
@@ -152,6 +196,12 @@ def wire_trial(binary, helper, root, env):
         client = NFSClient(server.port); handle = client.handle()
         restored = b''.join(client.read(handle, position, CHUNK)[0] for position in range(0, CAPACITY, CHUNK))
         if restored != expected: raise ValueError('Post-crash NFS data differs')
+        try:
+            mismatch = client.call(100003, 7, opaque(handle) + struct.pack('>QII', 0, 0, 2) + opaque(b'bad'))
+        except OSError: pass  # RPC GARBAGE_ARGS is also a valid rejection.
+        else:
+            if mismatch.uint() == 0: raise ValueError('NFS accepted mismatched write count')
+        if client.read(handle, 0, 3)[0] != expected[:3]: raise ValueError('Invalid write changed committed data')
         try: client.write(handle, CAPACITY, b'x')
         except OSError: pass
         else: raise ValueError('NFS allowed file growth')
@@ -164,6 +214,8 @@ def wire_trial(binary, helper, root, env):
         if client.read(handle, 16380, 40)[0] != expected[16380:16420]: raise ValueError('Server failed after malformed input')
         return {'passed': True, 'bytes_verified': CAPACITY, 'file_sync_acknowledgements': 64,
                 'explicit_commit': True, 'crash_reopen': True, 'mounted': False,
+                'mismatched_write_rejected': True, 'oversized_rpc_rejected': True,
+                'pipelined_writes_verified': 32,
                 'sha256': hashlib.sha256(restored).hexdigest()}
     finally:
         if client: client.close()
@@ -171,12 +223,13 @@ def wire_trial(binary, helper, root, env):
 
 
 def io_worker(stage, filename):
-    expected = expected_data()
+    expected = mounted_data()
+    initial = expected_data()
     fd = os.open(filename, os.O_RDWR if stage == 'write' else os.O_RDONLY)
     try:
         if stage == 'write':
             for position in range(0, CAPACITY, CHUNK):
-                count = os.pwrite(fd, expected[position:position + CHUNK], position)
+                count = os.pwrite(fd, initial[position:position + CHUNK], position)
                 if count != CHUNK: raise OSError('Short mounted write')
             # Crosses two native pages and tests read-modify-write through the mount.
             patch = expected[16380:16420]
@@ -184,7 +237,10 @@ def io_worker(stage, filename):
             os.fsync(fd)
         restored = b''.join(os.pread(fd, CHUNK, p) for p in range(0, CAPACITY, CHUNK))
         if restored != expected: raise ValueError('Mounted file integrity failure')
-        return {'passed': True, 'bytes_verified': len(restored), 'sha256': hashlib.sha256(restored).hexdigest()}
+        with mmap.mmap(fd, CAPACITY, access=mmap.ACCESS_READ) as mapped:
+            if mapped[:] != expected: raise ValueError('Mounted mmap integrity failure')
+        return {'passed': True, 'bytes_verified': len(restored), 'mmap_read_verified': True,
+                'sha256': hashlib.sha256(restored).hexdigest()}
     finally: os.close(fd)
 
 
@@ -199,7 +255,8 @@ def mount_trial(binary, helper, root, env, ci):
             result = subprocess.run(prefix + ['/sbin/umount', '-f', str(mountpoint)], capture_output=True, timeout=20)
             if result.returncode or os.path.ismount(mountpoint): raise OSError('Lab mount could not be removed')
     try:
-        for index, stage in enumerate(('write', 'verify')):
+        for index, stage in enumerate(('write', 'verify', 'pause')):
+            print('Mounted lab stage: ' + stage, file=sys.stderr, flush=True)
             server = Server(binary, helper, 'local-create' if index == 0 else 'local-open', root / 'mount-store', env)
             options = f'vers=3,tcp,nolocks,soft,timeo=10,retrans=1,rsize=65536,wsize=65536,actimeo=0,nosuid,nodev,port={server.port},mountport={server.port}'
             result = subprocess.run(prefix + ['/sbin/mount_nfs', '-o', options, '127.0.0.1:/', str(mountpoint)], capture_output=True, text=True, timeout=30)
@@ -208,7 +265,31 @@ def mount_trial(binary, helper, root, env, ci):
                 return report
             if not os.path.ismount(mountpoint): raise ValueError('Mount command succeeded without a mount')
             report['mounted'] = True
-            worker = subprocess.run([sys.executable, __file__, '--worker', stage, str(mountpoint / 'pages')], capture_output=True, text=True, timeout=90)
+            worker_args = [sys.executable, __file__, '--worker', stage, str(mountpoint / 'pages')]
+            if stage == 'pause':
+                # Fresh mount: no data was read before pausing the whole server/helper group.
+                os.killpg(server.process.pid, signal.SIGSTOP)
+                started = time.monotonic()
+                worker_process = subprocess.Popen(worker_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                try:
+                    time.sleep(1)
+                    premature = worker_process.poll() is not None
+                finally:
+                    os.killpg(server.process.pid, signal.SIGCONT)
+                try:
+                    stdout, stderr = worker_process.communicate(timeout=90)
+                except subprocess.TimeoutExpired:
+                    unmount()
+                    worker_process.kill()
+                    worker_process.communicate(timeout=5)
+                    raise
+                if premature: raise ValueError('Cold mounted read did not wait for paused server')
+                report['pause_observation'] = {'injected_server_pause_seconds': 1,
+                    'worker_elapsed_seconds': round(time.monotonic() - started, 3),
+                    'blocked_until_resumed': True, 'physical_wifi_drop': False}
+                worker = subprocess.CompletedProcess(worker_args, worker_process.returncode, stdout, stderr)
+            else:
+                worker = subprocess.run(worker_args, capture_output=True, text=True, timeout=90)
             if worker.returncode: raise OSError('Mounted I/O worker failed: ' + worker.stderr[-500:])
             report[stage] = json.loads(worker.stdout)
             unmount(); server.stop(); server = None
@@ -239,6 +320,7 @@ def main():
               'synthetic_only': True, 'system_swap_modified': False, 'live_r2': False}
     try:
         report['wire'] = wire_trial(args.server.resolve(strict=True), args.helper.resolve(strict=True), root, env)
+        report['checkpoint'] = checkpoint_trial(args.server.resolve(), args.helper.resolve(), root, env)
         if args.mount: report['mount'] = mount_trial(args.server.resolve(), args.helper.resolve(), root, env, args.ci)
         report['passed'] = report['wire']['passed'] and (not args.mount or report['mount'].get('passed', False))
     except Exception as error:

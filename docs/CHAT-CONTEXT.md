@@ -65,3 +65,13 @@ The current development Mac lacks a FUSE runtime. Direct callback tests and real
 helper-process restart/failure tests are therefore recorded separately from a
 mounted filesystem and from kernel paging. The adapter is deliberately fixed at
 4 MiB while its failure semantics are tested. See `labs/macos-fuse/README.md`.
+
+## Integration follow-through
+
+The user again instructed us to complete the authorised work without stopping.
+PR #8 combines all six pending feature/research branches. A Rust bridge through
+macOS's built-in NFS client was added to obtain a real mount proof without
+installing a third-party filesystem runtime on the working Mac. FUSE-T's binary
+licence was inspected before adoption and contains commercial-use restrictions.
+No binary was installed. This is still aimed at proving the storage path before
+the separate, unresolved native Mac kernel swap gate.

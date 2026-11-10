@@ -4,7 +4,7 @@ Research towards cloud-backed swap for existing macOS applications, with a nativ
 
 **Current build does not redirect macOS swap or demonstrate reclaimed disk space.** It provides a native Mac menu-bar app, encrypted local/external storage, an R2 pager and optional full local mirror. Actual Linux kernel paging and controlled disconnects are verified against a loopback HTTP object service. Live R2, physical drive/Wi-Fi tests and native Mac swap attachment remain unverified.
 
-**Continuing in Codex? Start with [CODEX-HANDOVER.md](docs/CODEX-HANDOVER.md) and [CHAT-CONTEXT.md](docs/CHAT-CONTEXT.md).** The implementation, research submodules and handover records are on `main`. [PR #1](https://github.com/EmotiveImpact/CLOUDSWAP/pull/1) was merged after all three CI workflows passed.
+**Continuing in Codex? Start with [CODEX-HANDOVER.md](docs/CODEX-HANDOVER.md) and [CHAT-CONTEXT.md](docs/CHAT-CONTEXT.md).** PR #8 consolidates the subsequent research, storage integrity, tiered trial and native file adapters on `feat/mac-integration-lab`. Check its merge state before choosing a checkout. The menu-bar foundation is already on `main`.
 
 ## Build on a Mac
 
@@ -62,3 +62,11 @@ native helper protocol over local/external, remote and mirrored page backends.
 [Run instructions and limits](labs/macos-fuse/README.md) and
 [verification evidence](labs/macos-fuse/validation.json) distinguish tested
 callbacks and process recovery from the still-unverified mount and Mac swap path.
+
+### Rust bridge through the built-in Mac NFS client
+
+[The NFS laboratory](labs/macos-nfs/README.md) exports the same encrypted file
+without a third-party filesystem runtime. Its separate Cargo.lock pins a
+BSD-licensed server and dependencies. The main app still builds offline without
+those dependencies. The wire and mounted tests have separate results; neither
+constitutes native system-swap attachment.

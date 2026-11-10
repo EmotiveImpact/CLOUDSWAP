@@ -1,0 +1,2 @@
+# Preserve upstream source bytes and licence text; local provenance hashes cover them.
+labs/macos-nfs/vendor/** whitespace=-blank-at-eol

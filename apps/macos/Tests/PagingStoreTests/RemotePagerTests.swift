@@ -134,6 +134,23 @@ final class RemotePagerTests: XCTestCase {
         let restored = try await pager.read(block: 0)
         XCTAssertEqual(restored, payload)
     }
+    func testRemoteCheckpointRejectsAuthenticatedIndexRollback() async throws {
+        let pager = try RemotePager(directory: root, key: key, backend: MemoryObjects(), create: true)
+        try await pager.write(block: 0, data: payload)
+        let manifest = root.appendingPathComponent("remote-index.enc")
+        let old = try Data(contentsOf: manifest)
+        try await pager.write(block: 1, data: payload)
+        try old.write(to: manifest)
+        do { try await pager.checkpoint(); XCTFail() } catch PagingError.invalid {}
+        do { _ = try await pager.read(block: 0); XCTFail() } catch PagingError.poisoned {}
+    }
+    func testRemoteCheckpointRejectsMissingIndex() async throws {
+        let pager = try RemotePager(directory: root, key: key, backend: MemoryObjects(), create: true)
+        try await pager.write(block: 0, data: payload)
+        try FileManager.default.removeItem(at: root.appendingPathComponent("remote-index.enc"))
+        do { try await pager.checkpoint(); XCTFail() } catch PagingError.unavailable {}
+        do { _ = try await pager.read(block: 0); XCTFail() } catch PagingError.poisoned {}
+    }
     func testTruncatedAndOversizedPagesAreRejected() async throws {
         let backend = MemoryObjects()
         let pager = try RemotePager(directory: root, key: key, backend: backend, create: true)

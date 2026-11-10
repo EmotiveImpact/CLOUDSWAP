@@ -84,3 +84,7 @@ Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only 
 8. Keep Cairn file offloading separate until durable file restore, keys, metadata and consent are designed.
 
 User expects continued implementation and testing without repeated requests to proceed. Report genuine missing access/hardware/credentials precisely. Do not equate passing storage tests with a completed Mac swap product.
+
+## Kernel candidate assessment and integrity increment
+
+See [kernel project assessment](../research/kernel/PROJECT-ASSESSMENT.md) for the user's XNU, MacKernelSDK, linux-mac, Containerization and NanoKernel links. Both existing full published XNU snapshots were reverified. RemotePager now checks the exact combined AES-GCM page size before decrypting, including mirror reopen. Four added native regressions cover missing, malformed, stale and cross-block payloads; all 33 XCTest tests passed. This does not implement native system-swap attachment.

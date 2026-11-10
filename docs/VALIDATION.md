@@ -53,3 +53,9 @@ The [Linux kernel swap lab](https://github.com/EmotiveImpact/CLOUDSWAP/actions/w
 The [first run](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42817073745) recorded 6,120 page-outs and 6,151 page-ins in the healthy case. The probe verified all 24 MiB. With an immediate read failure during a one-second service disconnect, the workload received SIGBUS. The outage harness interrupts HTTP connections on loopback. R2 and physical network or drive loss still require separate trials.
 
 The lab compares a 2.5-second retry budget against one-second and four-second service outages. The native R2 pager applies the same budget to immutable page reads after transient network errors. HTTP responses such as 404 propagate immediately. Writes retain their existing uncertain-acknowledgement policy.
+
+## Remote-page integrity, 10 November 2026
+
+33 native XCTest tests passed (four new remote failure/substitution cases). The new cases reject missing committed objects, truncated/oversized responses, old-generation ciphertext at the current object name, and ciphertext substituted from another block. Missing-object and malformed-response recovery are checked after restoring the correct backend data. Tests use an in-memory backend and temporary directories, not live R2 or kernel paging. Both complete pinned XNU source trees and the other three kernel-research sources passed the existing source verifier.
+
+The macOS release app build, ad-hoc signature verification and packaged R2Lab cryptographic self-test also passed for this increment. No R2 requests were made.

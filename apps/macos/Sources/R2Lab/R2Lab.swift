@@ -1,5 +1,6 @@
 import Foundation
 import CryptoKit
+import PagingStore
 
 func sha(_ data: Data) -> String { SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() }
 func mac(_ key: Data, _ text: String) -> Data {
@@ -71,6 +72,7 @@ struct R2Client {
 
 @main struct R2Lab {
     static func main() async {
+        if CommandLine.arguments.contains("--pager-live") { await pagerLive(); return }
         if CommandLine.arguments.contains("--self-test") {
             do {
                 let key = SymmetricKey(size: .bits256)
@@ -116,5 +118,53 @@ struct R2Client {
             }
             exit(1)
         }
+    }
+}
+
+extension R2Client: ObjectBackend {
+    func put(key: String, data: Data) async throws { _ = try await request("PUT", key: key, body: data) }
+    func get(key: String) async throws -> Data { try await request("GET", key: key) }
+}
+
+
+actor TrackedLabBackend: ObjectBackend {
+    let client: R2Client
+    var keys: [String] = []
+    init(_ client: R2Client) { self.client = client }
+    func put(key: String, data: Data) async throws {
+        keys.append(key)
+        try await client.put(key: key, data: data)
+    }
+    func get(key: String) async throws -> Data { try await client.get(key: key) }
+    func cleanup() async -> Bool {
+        var success = true
+        for key in keys {
+            do { _ = try await client.request("DELETE", key: key) }
+            catch { print("Cleanup unconfirmed for synthetic object: \(key)"); success = false }
+        }
+        return success
+    }
+}
+extension R2Lab {
+    static func pagerLive() async {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        var backend: TrackedLabBackend?
+        var passed = false
+        do {
+            let b = TrackedLabBackend(try R2Client()); backend = b
+            let key = SymmetricKey(size: .bits256)
+            var pager: RemotePager? = try RemotePager(directory: root, key: key, backend: b, create: true)
+            let data = Data((0..<PagingStore.blockSize).map { _ in UInt8.random(in: 0...255) })
+            try await pager!.write(block: 0, data: data)
+            pager = nil
+            let reopened = try RemotePager(directory: root, key: key, backend: b)
+            let restored = try await reopened.read(block: 0)
+            guard restored == data else { throw LabError.integrity }
+            print("PASS: encrypted remote page recovered after pager reopen. Synthetic data only; no system swap.")
+            passed = true
+        } catch { print("Remote paging lab failed. No system swap was changed.") }
+        if let b = backend { if !(await b.cleanup()) { passed = false } }
+        try? FileManager.default.removeItem(at: root)
+        if !passed { exit(1) }
     }
 }

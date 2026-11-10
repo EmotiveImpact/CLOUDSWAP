@@ -6,7 +6,7 @@ public enum PagingError: Error { case invalid, missing, busy, poisoned }
 
 /// Local encrypted reference backend. Process-restart recovery, not power-loss durability.
 /// The caller must retain the key; no keys are written to this directory.
-private final class FileLock {
+final class FileLock {
     let fd: Int32
     init(_ fd: Int32) { self.fd = fd }
     deinit { flock(fd, LOCK_UN); Darwin.close(fd) }

@@ -1,1 +1,40 @@
 # CLOUDSWAP
+
+Research towards cloud-backed swap for existing macOS applications, with a native menu-bar app and a portable Rust core.
+
+**Current build does not redirect macOS swap or free disk space.** It provides a compiled Mac monitor, a Rust failure-policy simulator, a native encrypted R2 probe, and the preserved Linux/Python experiment. Real R2 access, Linux kernel paging and Mac kernel paging are distinct, currently unverified gates.
+
+## Build on a Mac
+
+Requires macOS 13+, Xcode command-line tools and a Rust toolchain on PATH. No third-party Swift or Rust packages are required for this foundation.
+
+```sh
+cargo test --offline
+bash scripts/build-mac.sh
+open dist/CLOUDSWAP.app
+```
+
+The menu shows swap usage, available disk space and network-path availability. Its simulation button launches the bundled Rust helper. Network availability does not mean R2 is reachable. The app is ad-hoc signed for local development, not notarised for distribution.
+
+## Native R2 experiment
+
+```sh
+.build-cache/package/release/R2Lab --self-test
+.build-cache/package/release/R2Lab --live
+```
+
+Live mode requires `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` supplied securely in the process environment. Do not commit secrets or paste them into an issue. Use a dedicated private test bucket and bucket-scoped object read/write credentials. The probe uploads 16 KiB of encrypted synthetic data, reads and authenticates it, then deletes only that unique test object. Cleanup failure reports the object key for later removal. It does not upload app memory or files.
+
+The Swift R2 probe is not yet connected to the Rust pager. Its SigV4 implementation is compiled but awaits live interoperability verification. This small bounded experiment is not a production R2 SDK.
+
+## Layout
+
+- `apps/macos`: SwiftUI menu-bar app and native CryptoKit/URLSession R2 probe.
+- `crates/cloudswap-core`: Rust acknowledgement and failure policy; simulated transport only.
+- `labs/linux-python`: original AES-GCM/R2 storage prototype and nbdkit adapter. Unit-tested on Mac; not yet attached to Linux swap.
+- `research`: pinned upstream source archives, provenance manifests and porting analysis.
+- `docs`: architecture, evidence and next verification gates.
+
+See [research](research/RESEARCH.md), [architecture](docs/ARCHITECTURE.md), [validation](docs/VALIDATION.md), and [work packages](docs/WORK-PACKAGES.md).
+
+Cairn may later reuse cloud storage and retrieval components for file offloading. That requires durable keys, metadata and restoration semantics beyond ephemeral swap. It remains a separate feature track.

@@ -41,6 +41,17 @@ readiness check confirmed that all four required repository secrets are absent;
 the live job correctly skipped. Configuration names, test commands and the
 recorded result are in that document. Never put credential values in the repo.
 
+## Growable storage increment
+
+`feat/mac-sparse-volume` adds `SparseVolume`, `R2Lab --volume-server` and
+`cloudswap-nfs-lab --sparse-lab`: encrypted sparse files with create/resize,
+atomic multi-page mapping commits, truncate/regrow, rename/replacement and
+persistent exclusive-create verifiers. See [SPARSE-VOLUME.md](SPARSE-VOLUME.md)
+for exact limits. Objects are retained and capped, not garbage-collected; this
+is still a synthetic laboratory. The existing fixed-file mode remains tested.
+Check the branch/PR and hosted mounted results before claiming this increment
+is merged or that it provides native system swap.
+
 ## Earlier milestones and implementation map
 
 The records below describe successive earlier milestones. Test counts and

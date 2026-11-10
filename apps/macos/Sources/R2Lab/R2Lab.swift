@@ -77,6 +77,7 @@ struct R2Client {
         }
 
         if CommandLine.arguments.contains("--file-server") { await fileServer(); return }
+        if CommandLine.arguments.contains("--volume-server") { await volumeServer(); return }
         if CommandLine.arguments.contains("--pager-live") { await pagerLive(); return }
         if CommandLine.arguments.contains("--self-test") {
             do {

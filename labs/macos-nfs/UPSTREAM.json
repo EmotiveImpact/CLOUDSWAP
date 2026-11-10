@@ -10,7 +10,10 @@
     "Two-entry reply queue",
     "NFS WRITE count validation",
     "NFS COMMIT invokes a backend checkpoint",
-    "Independent bounded TCP receive, processing and reply flows prevent pipelined-write deadlock"
+    "Independent bounded TCP receive, processing and reply flows prevent pipelined-write deadlock",
+    "Persist exclusive CREATE verifiers through a backend callback",
+    "Atomic GUARDED CREATE callback avoids lookup/create races",
+    "FSSTAT uses backend quotas rather than fabricated 1 TiB capacity"
   ],
   "files": {
     "Cargo.toml": {
@@ -55,7 +58,7 @@
     },
     "src/nfs_handlers.rs": {
       "original_sha256": "826c832c029d29a946ed73d07a5358e4fb3e9bf73fd81fdee3d31e67624eb510",
-      "vendored_sha256": "2c60d6414a98de148374acade235e1c6147e0ac44353ae18abae7439e8c60206"
+      "vendored_sha256": "023480b64ecd5711a8c9b424fd39aa77f9021547ccb3f9ac630170dafd22b135"
     },
     "src/portmap.rs": {
       "original_sha256": "9b18b95bed75f37c2836e9b40ffff2368afac23acf410c3370bf7b96a5e62828",
@@ -83,7 +86,7 @@
     },
     "src/vfs.rs": {
       "original_sha256": "e4f76595e0e3193612fe124094971f696d92547b8e79eb891e11849ebf0e9578",
-      "vendored_sha256": "3c0530e44cac67d7f6823bc4bf7523907accda1187946fa4af996d6228bebc5d"
+      "vendored_sha256": "119e4d4824d36f1b489ea576a46bd4e9de36ec862df1808d1da18703efb64176"
     },
     "src/write_counter.rs": {
       "original_sha256": "a530d38d13ad29f07544eaafe92116736ca69daafacdfbe5c44f128051d1f5e5",

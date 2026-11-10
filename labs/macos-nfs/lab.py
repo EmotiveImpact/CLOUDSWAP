@@ -119,15 +119,15 @@ class NFSClient:
 
 
 class Server:
-    def __init__(self, binary, helper, mode, directory, env):
-        self.process = subprocess.Popen([str(binary), '--synthetic-lab', str(helper), mode, str(directory)],
+    def __init__(self, binary, helper, mode, directory, env, flag="--synthetic-lab", capacity=CAPACITY, kind=None):
+        self.process = subprocess.Popen([str(binary), flag, str(helper), mode, str(directory)],
                                         env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
         try:
             ready, _, _ = select.select([self.process.stdout], [], [], 15)
             if not ready: raise OSError('NFS server startup timed out')
             line = self.process.stdout.readline(4096)
             hello = json.loads(line)
-            if hello.get('capacity') != CAPACITY or hello.get('synthetic_only') is not True: raise ValueError('Invalid NFS handshake')
+            if hello.get('capacity') != capacity or hello.get('synthetic_only') is not True or (kind is not None and hello.get('kind') != kind): raise ValueError('Invalid NFS handshake')
             self.port = int(hello['port'])
             if not 1024 <= self.port <= 65535: raise ValueError('Invalid NFS port')
         except Exception:

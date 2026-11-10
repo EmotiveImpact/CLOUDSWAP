@@ -72,6 +72,7 @@ struct R2Client {
 
 @main struct R2Lab {
     static func main() async {
+        if CommandLine.arguments.contains("--file-server") { await fileServer(); return }
         if CommandLine.arguments.contains("--pager-live") { await pagerLive(); return }
         if CommandLine.arguments.contains("--self-test") {
             do {

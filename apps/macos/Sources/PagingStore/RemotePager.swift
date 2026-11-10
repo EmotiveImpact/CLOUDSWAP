@@ -24,7 +24,7 @@ public actor RemotePager {
     public init(directory: URL, key: SymmetricKey, backend: ObjectBackend, create: Bool = false, mirror: Bool = false) throws {
         self.directory = directory; self.key = key; self.backend = backend; self.mirror = mirror
         if create {
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+            guard mkdir(directory.path, 0o700) == 0 else { throw PagingError.unavailable }
         }
         let storage = try StoreDirectory(directory)
         self.storage = storage
@@ -83,6 +83,11 @@ public actor RemotePager {
             if mirror, let old = old { storage.remove(old) }
         } catch { poisoned = true; throw error }
     }
+    public func checkpoint() throws {
+        guard !poisoned else { throw PagingError.poisoned }
+        guard !busy else { throw PagingError.busy }
+        do { try storage.validate() } catch { poisoned = true; throw error }
+    }
     public func read(block: Int) async throws -> Data {
         try begin(block); defer { busy = false }
         guard let object = index[String(block)] else { throw PagingError.missing }
@@ -91,7 +96,10 @@ public actor RemotePager {
             do { bytes = try storage.read(object) }
             catch { poisoned = true; throw error }
         } else {
-            bytes = try await backend.get(key: "cloudswap-lab/\(object)/probe")
+            do { bytes = try await backend.get(key: "cloudswap-lab/\(object)/probe") }
+            // Missing is reserved for an unwritten logical page. A committed
+            // object's disappearance must never be presented as a zero-filled hole.
+            catch PagingError.missing { throw PagingError.unavailable }
         }
         do { try storage.validate() } catch { poisoned = true; throw error }
         let data = try AES.GCM.open(AES.GCM.SealedBox(combined: bytes), using: key,

@@ -84,3 +84,18 @@ Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only 
 8. Keep Cairn file offloading separate until durable file restore, keys, metadata and consent are designed.
 
 User expects continued implementation and testing without repeated requests to proceed. Report genuine missing access/hardware/credentials precisely. Do not equate passing storage tests with a completed Mac swap product.
+
+## Native file adapter, 10 November 2026
+
+Branch `feat/fuse-file-adapter` adds an executable FUSE frontend, a bounded
+stdin/stdout server in R2Lab and `VirtualPageFile` over the local, remote and
+mirrored encrypted stores. Read [the adapter instructions](../labs/macos-fuse/README.md)
+for exact commands, key handling, storage contract and remaining gates. This is
+separate from PR #5's tiered trial and does not depend on that unmerged branch.
+
+The actual filesystem callbacks and helper-process restart are tested without a
+mount. The current Mac has no FUSE runtime, so mounting and compatibility of the
+pinned Python binding remain unverified. No native swap attachment, physical
+unplug result, live R2 result or internal-space saving is claimed. `*-create`
+rejects existing directories; a missing committed remote object no longer has
+unwritten-page semantics. The protocol and tests never persist the encryption key.

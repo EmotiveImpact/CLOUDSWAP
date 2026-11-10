@@ -71,10 +71,16 @@ public final class PagingStore {
         } catch { poisoned = true; throw error }
         if let old = old { storage.remove(old) }
     }
+    public func checkpoint() throws {
+        mutex.lock(); defer { mutex.unlock() }
+        guard !poisoned else { throw PagingError.poisoned }
+        do { try storage.validate() } catch { poisoned = true; throw error }
+    }
     public func read(block: Int) throws -> Data {
         mutex.lock(); defer { mutex.unlock() }
         guard !poisoned else { throw PagingError.poisoned }
         guard block >= 0, block < Self.maxBlocks else { throw PagingError.invalid }
+        do { try storage.validate() } catch { poisoned = true; throw error }
         guard let object = index[String(block)] else { throw PagingError.missing }
         let raw: Data
         do { raw = try storage.read(object) }

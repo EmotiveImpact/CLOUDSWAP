@@ -23,3 +23,8 @@ jobs:
       - run: bash scripts/build-mac.sh
       - run: dist/CLOUDSWAP.app/Contents/Helpers/cloudswap-lab
       - run: dist/CLOUDSWAP.app/Contents/Helpers/R2Lab --self-test
+      - name: FUSE callbacks and native helper faults (no mount)
+        run: |
+          export CLOUDSWAP_FILE_HELPER="$PWD/dist/CLOUDSWAP.app/Contents/Helpers/R2Lab"
+          python3 -m unittest discover -s labs/macos-fuse -v
+          python3 labs/macos-fuse/cloudswap_fuse.py --self-test --helper "$CLOUDSWAP_FILE_HELPER"

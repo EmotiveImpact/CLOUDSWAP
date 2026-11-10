@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "collected_at_utc": "2026-11-10T13:02:52.010510+00:00",
+  "observations": {
+    "architecture": {
+      "state": "observed",
+      "value": "arm64"
+    },
+    "darwin_release": {
+      "state": "observed",
+      "value": "23.5.0"
+    },
+    "kernel_build": {
+      "state": "observed",
+      "xnu_version": "10063.121.3",
+      "release_kernel": true
+    },
+    "macos_version": {
+      "state": "observed",
+      "value": "14.5"
+    },
+    "macos_build": {
+      "state": "observed",
+      "value": "23F79"
+    },
+    "model": {
+      "state": "access_denied",
+      "exit_code": 1
+    },
+    "memory_bytes": {
+      "state": "access_denied",
+      "exit_code": 1
+    },
+    "page_bytes": {
+      "state": "access_denied",
+      "exit_code": 1
+    },
+    "swapfileprefix": {
+      "state": "access_denied",
+      "exit_code": 1
+    },
+    "swap_usage": {
+      "state": "access_denied",
+      "exit_code": 1
+    }
+  },
+  "system_swap_modified": false,
+  "external_swap_verified": false,
+  "cloud_swap_verified": false,
+  "capability_verdict": "unverified",
+  "manual_evidence_needed": [
+    "startup security policy",
+    "physical or virtual machine",
+    "external drive protocol and filesystem",
+    "actual target-volume paging traces"
+  ]
+}

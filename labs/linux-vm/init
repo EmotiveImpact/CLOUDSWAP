@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+export PATH=/bin:/sbin
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs dev /dev
+/bin/sh /load-modules
+exec </dev/ttyS0 >/dev/ttyS0 2>&1
+stty -echo
+for attempt in 1 2 3 4 5; do
+    [ ! -b /dev/vda ] || break
+    sleep 1
+done
+mkswap /dev/vda
+swapon /dev/vda
+mount -t cgroup2 none /sys/fs/cgroup
+printf '+memory\n' > /sys/fs/cgroup/cgroup.subtree_control
+mkdir /sys/fs/cgroup/probe
+printf '12582912\n' > /sys/fs/cgroup/probe/memory.max
+printf '41943040\n' > /sys/fs/cgroup/probe/memory.swap.max
+status=0
+/probe || status=$?
+printf 'PROBE_EXIT status=%s\n' "$status"
+poweroff -f

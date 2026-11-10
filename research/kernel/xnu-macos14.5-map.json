@@ -1,0 +1,143 @@
+{
+  "commit": "2c2f96dc2b9a4408a43d3150ae9c105355ca3daa",
+  "kind": "source_anchors_not_runtime_validation",
+  "anchors": [
+    {
+      "file": "bsd/kern/kern_sysctl.c",
+      "file_sha256": "6ec9663687ba16cbfbb7bd6609a24e4c32b793ff732fde63895b462b09dfa49d",
+      "search": "SYSCTL_STRING(_vm, OID_AUTO, swapfileprefix",
+      "lines": [
+        4516
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/kern/kern_newsysctl.c",
+      "file_sha256": "5f5a384e7b6b1c9e7d8ab6d1756c3926bd55de4490815d78fbf31bd67d67ee65",
+      "search": "if (from_kernel && !(oid->oid_kind & CTLFLAG_KERN))",
+      "lines": [
+        1719
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/kern/kern_newsysctl.c",
+      "file_sha256": "5f5a384e7b6b1c9e7d8ab6d1756c3926bd55de4490815d78fbf31bd67d67ee65",
+      "search": "error = mac_system_check_sysctlbyname",
+      "lines": [
+        1774
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/sys/sysctl.h",
+      "file_sha256": "c8e3ae8a6a560c9d6abcad2f2ea83fe377f9f962179f28c30baab87c002477f4",
+      "search": "#define CTLFLAG_KERN",
+      "lines": [
+        164
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/dp_backing_file.c",
+      "file_sha256": "7391fd982dd9e73659e65f6be6755d9a3a92f1ada468077a342b726a4f0185b1",
+      "search": "macx_swapon(",
+      "lines": [
+        181
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/dp_backing_file.c",
+      "file_sha256": "7391fd982dd9e73659e65f6be6755d9a3a92f1ada468077a342b726a4f0185b1",
+      "search": "macx_swapoff(",
+      "lines": [
+        194
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "2d9f4c22ecf83fcfe8aa30a5d956c2584370b42a1fe7109014a33401c87f8396",
+      "search": "vm_swapfile_open(const char *path, vnode_t *vp)",
+      "lines": [
+        44,
+        59
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "2d9f4c22ecf83fcfe8aa30a5d956c2584370b42a1fe7109014a33401c87f8396",
+      "search": "mnt_kern_flag & MNTK_NOSWAP",
+      "lines": [
+        75
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "2d9f4c22ecf83fcfe8aa30a5d956c2584370b42a1fe7109014a33401c87f8396",
+      "search": "vm_swapfile_io(vnode_t vp",
+      "lines": [
+        49,
+        194
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "2d9f4c22ecf83fcfe8aa30a5d956c2584370b42a1fe7109014a33401c87f8396",
+      "search": "vnode_pagein(vp",
+      "lines": [
+        235
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "2d9f4c22ecf83fcfe8aa30a5d956c2584370b42a1fe7109014a33401c87f8396",
+      "search": "vnode_pageout(vp",
+      "lines": [
+        252
+      ],
+      "state": "found"
+    },
+    {
+      "file": "osfmk/vm/vm_compressor_backing_store.c",
+      "file_sha256": "198bff724b0f4dc206de4ced2a8807e90e879ba128a8124fc1c11c1512f7687e",
+      "search": "swapfilename[MAX_SWAPFILENAME_LEN",
+      "lines": [
+        78
+      ],
+      "state": "found"
+    },
+    {
+      "file": "osfmk/vm/vm_compressor_backing_store.c",
+      "file_sha256": "198bff724b0f4dc206de4ced2a8807e90e879ba128a8124fc1c11c1512f7687e",
+      "search": "snprintf(swf->swp_path",
+      "lines": [
+        1535
+      ],
+      "state": "found"
+    },
+    {
+      "file": "osfmk/vm/vm_compressor_backing_store.c",
+      "file_sha256": "198bff724b0f4dc206de4ced2a8807e90e879ba128a8124fc1c11c1512f7687e",
+      "search": "vm_swap_get(c_segment_t",
+      "lines": [
+        1637
+      ],
+      "state": "found"
+    },
+    {
+      "file": "osfmk/vm/vm_compressor_backing_store.c",
+      "file_sha256": "198bff724b0f4dc206de4ced2a8807e90e879ba128a8124fc1c11c1512f7687e",
+      "search": "vm_swap_put(vm_offset_t",
+      "lines": [
+        1702
+      ],
+      "state": "found"
+    }
+  ]
+}

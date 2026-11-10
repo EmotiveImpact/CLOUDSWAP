@@ -1,0 +1,32 @@
+name: Verify kernel research
+on:
+  pull_request:
+    paths:
+      - '.gitmodules'
+      - 'research/kernel/**'
+      - 'research/kernel-sources/**'
+      - 'scripts/*kernel*'
+      - 'scripts/map-xnu-swap.py'
+      - 'scripts/mac-capabilities.py'
+      - 'scripts/tests/**'
+      - '.github/workflows/kernel-research.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  research:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - run: python3 -m unittest discover -s scripts/tests -v
+      - run: python3 scripts/verify-kernel-sources.py
+      - name: Verify reproducible source maps
+        run: |
+          python3 scripts/map-xnu-swap.py research/kernel-sources/xnu-macos14.5 > /tmp/host-map.json
+          python3 scripts/map-xnu-swap.py research/kernel-sources/xnu > /tmp/current-map.json
+          diff -u research/kernel/xnu-macos14.5-map.json /tmp/host-map.json
+          diff -u research/kernel/xnu-current-map.json /tmp/current-map.json

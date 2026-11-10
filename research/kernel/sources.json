@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "acquired": "2026-11-10",
+  "repositories": [
+    {
+      "name": "xnu-macos14.5",
+      "url": "https://github.com/apple-oss-distributions/xnu.git",
+      "commit": "2c2f96dc2b9a4408a43d3150ae9c105355ca3daa",
+      "tree": "5be55df705cd4a44bbcefa7722f3d7bf73042c70",
+      "tracked_files": 5193,
+      "licence_file": "APPLE_LICENSE",
+      "licence_sha256": "e5881019d8766c1e88a5fe1dbca4ba40c78011d41fcb18f6e9f50df60182685b",
+      "purpose": "Host-matching published XNU source"
+    },
+    {
+      "name": "xnu",
+      "url": "https://github.com/apple-oss-distributions/xnu.git",
+      "commit": "f6217f891ac0bb64f3d375211650a4c1ff8ca1ea",
+      "tree": "7cb04f5def354255785e3cb0e06d496dc918ebea",
+      "tracked_files": 5698,
+      "licence_file": "APPLE_LICENSE",
+      "licence_sha256": "e5881019d8766c1e88a5fe1dbca4ba40c78011d41fcb18f6e9f50df60182685b",
+      "purpose": "Pinned research snapshot"
+    },
+    {
+      "name": "ipsw",
+      "url": "https://github.com/blacktop/ipsw.git",
+      "commit": "e5a578c6f2f48be177fddf200d435d83cab1c38c",
+      "tree": "dcb0442a63812d9d2a904865a366258c066faaa3",
+      "tracked_files": 1685,
+      "licence_file": "LICENSE",
+      "licence_sha256": "1be9aa3150025004e57f170ce29dab4825b41dc0f05414eb7751411517a6ef6e",
+      "purpose": "Pinned research snapshot"
+    },
+    {
+      "name": "symbolicator",
+      "url": "https://github.com/blacktop/symbolicator.git",
+      "commit": "08dbc783663750530d655cb88c1e755aefa10950",
+      "tree": "1ddc3ba6efc59784014ab2db64950a0b9c6ad1eb",
+      "tracked_files": 8014,
+      "licence_file": "LICENSE",
+      "licence_sha256": "0f80d7de4f5110c966dd3b2b7f7f13579dcd58fca77c6e95cd9ffc58a168f90b",
+      "purpose": "Pinned research snapshot"
+    },
+    {
+      "name": "system_cmds",
+      "url": "https://github.com/apple-oss-distributions/system_cmds.git",
+      "commit": "408bba7453608006b89772db185defbac8fe2fd0",
+      "tree": "4565845129f748cb8fe3e3648ed9d3771431d276",
+      "tracked_files": 277,
+      "licence_file": "APPLE_LICENSE",
+      "licence_sha256": "99ddf37269bd2cee75d02d89b443a137ec9899a50519a4af5fc0c6fd2fd18150",
+      "purpose": "Apple userspace dynamic_pager prefix-setting and cleanup behaviour"
+    }
+  ]
+}

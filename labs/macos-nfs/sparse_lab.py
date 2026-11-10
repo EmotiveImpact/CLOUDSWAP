@@ -186,13 +186,38 @@ def mounted_worker(stage, path):
         if os.pread(fd, CHUNK, 8 * SHARD) != bytes(CHUNK): raise ValueError('Sparse hole leaked data')
         stat = os.fstat(fd)
         if stat.st_size != GIB: raise ValueError('Sparse size lost')
-        if stat.st_blocks * 512 >= 2 * 1024 ** 2: raise ValueError('Unexpected materialised page count')
         if stat.st_mode & 0o777 != 0o640: raise ValueError('Mode was not persisted')
         return {'passed': True, 'logical_size': GIB, 'payload_bytes_verified': len(OFFSETS) * CHUNK,
                 'mmap_verified': True, 'truncated_tail_zeroed': truncated,
-                'reported_payload_allocation': stat.st_blocks * 512,
-                'allocation_excludes_metadata_and_retired_objects': True}
+                # Darwin stat asks for va_total_alloc. NFSv3 only supplies
+                # va_data_alloc, so VFS can synthesise this from logical size.
+                # Measure actual backing files in the controller instead.
+                'client_stat_allocated_bytes': stat.st_blocks * 512}
     finally: os.close(fd)
+
+
+def backing_measurement(running, path):
+    client = Client(running.port)
+    try:
+        handle = client.lookup(client.root(), 'swapfile0')
+        client.commit(handle)
+        allocation = client.stat(handle)['used']
+    finally: client.close()
+    if not 0 < allocation < 2 * 1024 ** 2:
+        raise ValueError('Unexpected NFS committed payload allocation: ' + str(allocation))
+    # Synthetic private directory; include metadata, retained versions and
+    # catalogue rather than counting only the currently referenced payload.
+    inventory = [entry.stat(follow_symlinks=False) for entry in path.iterdir()]
+    logical = sum(item.st_size for item in inventory)
+    allocated = sum(item.st_blocks * 512 for item in inventory)
+    if len(inventory) > 512 or logical >= 4 * 1024 ** 2 or allocated >= 4 * 1024 ** 2:
+        raise ValueError(f'Sparse backing unexpectedly grew: {len(inventory)} objects, '
+                         f'{logical} bytes, {allocated} allocated bytes')
+    return {'nfs_committed_payload_bytes': allocation,
+            'backing_files': len(inventory), 'backing_file_bytes': logical,
+            'backing_allocated_bytes': allocated,
+            'backing_includes_metadata_and_retired_objects': True,
+            'backing_excludes_filesystem_directory_overhead': True}
 
 
 def mount_trial(binary, helper, root, env):
@@ -229,6 +254,7 @@ def mount_trial(binary, helper, root, env):
             if worker.returncode: raise OSError('Mounted worker failed: ' + stderr[-1000:])
             if paused and premature: raise ValueError('Fresh read did not wait for the paused server')
             report[stage] = json.loads(stdout)
+            report[stage].update(backing_measurement(running, root / 'mount-store'))
             if paused:
                 report['pause_observation'] = {'server_pause_seconds': 1, 'blocked_until_resumed': True,
                     'worker_elapsed_seconds': round(time.monotonic() - started, 3), 'physical_wifi_drop': False}

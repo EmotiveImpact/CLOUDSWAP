@@ -72,6 +72,17 @@ dirty mmap/msync, fsync, five unmount/restart/remount phases and a one-second
 server pause on Intel and arm64. `--ci-mount` is restricted to disposable
 CLOUDSWAP hosted CI. No system swap setting is changed by this laboratory.
 
+The first mounted run exposed a test-accounting error on both architectures:
+`stat().st_blocks` was treated as the committed payload allocation. Apple's
+NFSv3 source returns `va_data_alloc`, while `vn_stat` requests `va_total_alloc`;
+VFS can synthesise the latter from logical file size. The test now records the
+client stat value separately, checks NFS GETATTR `used`, and bounds the actual
+backing files' lengths and allocated blocks, including metadata and retained
+versions. Directory/filesystem overhead is excluded from that measurement.
+See pinned [NFS getattr](https://github.com/apple-oss-distributions/NFS/blob/93733ffccece4daee73bf6306b291d1ae69130c0/kext/nfs_vnops.c#L2134),
+[vn_stat](https://github.com/apple-oss-distributions/xnu/blob/f6217f891ac0bb64f3d375211650a4c1ff8ca1ea/bsd/vfs/vfs_vnops.c#L1537)
+and [VFS fallback](https://github.com/apple-oss-distributions/xnu/blob/f6217f891ac0bb64f3d375211650a4c1ff8ca1ea/bsd/vfs/kpi_vfs.c#L2968).
+
 At the initial implementation checkpoint, 73 native tests (16 new sparse-volume
 tests), four Rust tests, the sparse wire/crash/rollback lab and the original
 4 MiB pipelined wire regression passed locally. Mounted results must be read

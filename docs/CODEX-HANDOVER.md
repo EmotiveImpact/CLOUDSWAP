@@ -65,13 +65,21 @@ In the prior restricted local environment, Swift tests needed `--disable-sandbox
 
 Live R2 needs `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` supplied securely. Use a dedicated private test bucket with scoped credentials. Never commit values. Run the packaged R2Lab with `--live` for the object probe or `--pager-live` for integrated remote write/reopen/read/cleanup. Record cleanup failures.
 
+## Kernel mining update
+
+Pinned clones of XNU (host-matching and newer revisions), ipsw and symbolicator are now attached as submodules under `research/kernel-sources`. Initialise them with `git submodule update --init --recursive`. Read [kernel findings](../research/kernel/FINDINGS.md) and [multi-Mac testing](MULTI-MAC-TEST-PLAN.md).
+
+Both reviewed XNU revisions register `vm.swapfileprefix` as a writable string. Investigate this existing control point on an isolated system before assuming a custom driver is mandatory. Local read access was denied, so runtime support remains unverified. The unsupported old swapon API alone does not rule this candidate out. No swap configuration has been changed.
+
+Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only report. Separate physical tests from VM/CI evidence. Source map generation, pinned-checkout checks and four diagnostic regression tests are included.
+
 ## Continue here
 1. Review latest code and tests, then address recovery gaps: failed-write orphan accounting/reclamation, disk-full failures, abrupt process death, concurrency during awaited I/O, missing/corrupt objects and index rollback. Preserve uncertain-write fail-stop behaviour.
 2. Provide durable key management before persistent real data. Current keys are caller-owned; synthetic UI test keys are ephemeral. Do not represent a saved encrypted directory as recoverable without its key.
 3. Add persisted backend settings and accurate UI states only as corresponding capabilities become verified. Full-mirror byte reporting currently excludes allocation overhead, index and orphan files; measure actual allocated bytes.
 4. On an accessible Mac, test the external-folder action and controlled unplug/replug with synthetic data. Record mount identity, errors, recovery and retained test files. Do not unplug a drive containing live application swap.
 5. Run live R2 tests once credentials and network access exist, then measure latency, request amplification and cost, throttling and failure behaviour.
-6. Resolve the native Mac storage-adapter gate and separately prove that XNU actually selects it for swap. Original research considered SCSIControllerDriverKit software I/O; verify SDK, OS support and entitlements against current Apple sources. No adapter implementation or supported swap registration route has been demonstrated. A block device appearing in Disk Utility is not proof of swap.
+6. First investigate the existing swapfileprefix candidate using the kernel findings and isolated-system test plan. If it fails, identify the exact blocker, then resolve the native Mac storage-adapter gate and separately prove that XNU actually selects it for swap. Original research considered SCSIControllerDriverKit software I/O; verify SDK, OS support and entitlements against current Apple sources. No adapter implementation or supported swap registration route has been demonstrated. A block device appearing in Disk Utility is not proof of swap.
 7. Only after isolated Mac kernel paging works, run application survival, 1/10/60-second outages, blackholes, sleep/wake, recovery and net-space trials. Do not change the user's working system swap merely to make a demonstration appear complete.
 8. Keep Cairn file offloading separate until durable file restore, keys, metadata and consent are designed.
 

@@ -1,0 +1,141 @@
+{
+  "commit": "f6217f891ac0bb64f3d375211650a4c1ff8ca1ea",
+  "kind": "source_anchors_not_runtime_validation",
+  "anchors": [
+    {
+      "file": "bsd/kern/kern_sysctl.c",
+      "file_sha256": "1cc5d1e7b46df0b2fad33449eb7df948207b7bc4c760119ed33624e7d2750df8",
+      "search": "SYSCTL_STRING(_vm, OID_AUTO, swapfileprefix",
+      "lines": [
+        4703
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/kern/kern_newsysctl.c",
+      "file_sha256": "4d4426379cbe88039154365974cb7a93aac002d0f85c9055fb75d8bb0c0df408",
+      "search": "if (from_kernel && !(oid->oid_kind & CTLFLAG_KERN))",
+      "lines": [
+        1851
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/kern/kern_newsysctl.c",
+      "file_sha256": "4d4426379cbe88039154365974cb7a93aac002d0f85c9055fb75d8bb0c0df408",
+      "search": "error = mac_system_check_sysctlbyname",
+      "lines": [
+        1913
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/sys/sysctl.h",
+      "file_sha256": "adbdc68ccd8e8dece9c1914fd056c48e421d343d5d6d93553ef33473f5688dda",
+      "search": "#define CTLFLAG_KERN",
+      "lines": [
+        165
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/dp_backing_file.c",
+      "file_sha256": "4cf59a8e79a63783c63542b085f0bfe65c664aa5814f0dcd55ceb4aefe4a8e4f",
+      "search": "macx_swapon(",
+      "lines": [
+        182
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/dp_backing_file.c",
+      "file_sha256": "4cf59a8e79a63783c63542b085f0bfe65c664aa5814f0dcd55ceb4aefe4a8e4f",
+      "search": "macx_swapoff(",
+      "lines": [
+        195
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "8317ac57b995a139f947b57b15f54dccac235031ecab940ca3ebedc27b755490",
+      "search": "vm_swapfile_open(const char *path, vnode_t *vp)",
+      "lines": [
+        47
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "8317ac57b995a139f947b57b15f54dccac235031ecab940ca3ebedc27b755490",
+      "search": "mnt_kern_flag & MNTK_NOSWAP",
+      "lines": [
+        63
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "8317ac57b995a139f947b57b15f54dccac235031ecab940ca3ebedc27b755490",
+      "search": "vm_swapfile_io(vnode_t vp",
+      "lines": [
+        182
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "8317ac57b995a139f947b57b15f54dccac235031ecab940ca3ebedc27b755490",
+      "search": "vnode_pagein(vp",
+      "lines": [
+        223
+      ],
+      "state": "found"
+    },
+    {
+      "file": "bsd/vm/vm_compressor_backing_file.c",
+      "file_sha256": "8317ac57b995a139f947b57b15f54dccac235031ecab940ca3ebedc27b755490",
+      "search": "vnode_pageout(vp",
+      "lines": [
+        240
+      ],
+      "state": "found"
+    },
+    {
+      "file": "osfmk/vm/vm_compressor_backing_store.c",
+      "file_sha256": "540f969ed0585129d599271b6e9a6f0c3df1658549cc16fe285a2e7c84e2dd6d",
+      "search": "swapfilename[MAX_SWAPFILENAME_LEN",
+      "lines": [
+        83
+      ],
+      "state": "found"
+    },
+    {
+      "file": "osfmk/vm/vm_compressor_backing_store.c",
+      "file_sha256": "540f969ed0585129d599271b6e9a6f0c3df1658549cc16fe285a2e7c84e2dd6d",
+      "search": "snprintf(swf->swp_path",
+      "lines": [
+        1569
+      ],
+      "state": "found"
+    },
+    {
+      "file": "osfmk/vm/vm_compressor_backing_store.c",
+      "file_sha256": "540f969ed0585129d599271b6e9a6f0c3df1658549cc16fe285a2e7c84e2dd6d",
+      "search": "vm_swap_get(c_segment_t",
+      "lines": [
+        1671
+      ],
+      "state": "found"
+    },
+    {
+      "file": "osfmk/vm/vm_compressor_backing_store.c",
+      "file_sha256": "540f969ed0585129d599271b6e9a6f0c3df1658549cc16fe285a2e7c84e2dd6d",
+      "search": "vm_swap_put(vm_offset_t",
+      "lines": [
+        1736
+      ],
+      "state": "found"
+    }
+  ]
+}

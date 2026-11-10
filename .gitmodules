@@ -1,0 +1,15 @@
+[submodule "research/kernel-sources/xnu-macos14.5"]
+	path = research/kernel-sources/xnu-macos14.5
+	url = https://github.com/apple-oss-distributions/xnu.git
+
+[submodule "research/kernel-sources/xnu"]
+	path = research/kernel-sources/xnu
+	url = https://github.com/apple-oss-distributions/xnu.git
+
+[submodule "research/kernel-sources/ipsw"]
+	path = research/kernel-sources/ipsw
+	url = https://github.com/blacktop/ipsw.git
+
+[submodule "research/kernel-sources/symbolicator"]
+	path = research/kernel-sources/symbolicator
+	url = https://github.com/blacktop/symbolicator.git

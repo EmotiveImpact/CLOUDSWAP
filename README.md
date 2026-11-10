@@ -42,3 +42,7 @@ The Swift R2 client is connected to the native RemotePager. The Rust component r
 See [research](research/RESEARCH.md), [architecture](docs/ARCHITECTURE.md), [validation](docs/VALIDATION.md), and [work packages](docs/WORK-PACKAGES.md).
 
 Cairn may later reuse cloud storage and retrieval components for file offloading. That requires durable keys, metadata and restoration semantics beyond ephemeral swap. It remains a separate feature track.
+
+## Kernel research and multiple Macs
+
+Pinned XNU, ipsw and symbolicator source checkouts are included as Git submodules. Run `git submodule update --init --recursive` to fetch them. Read the [kernel source findings](research/kernel/FINDINGS.md) and [multi-Mac test plan](docs/MULTI-MAC-TEST-PLAN.md). The newly identified `vm.swapfileprefix` candidate is unverified on a running target; no system swap changes have been made. `python3 scripts/mac-capabilities.py` collects a read-only report for each test Mac.

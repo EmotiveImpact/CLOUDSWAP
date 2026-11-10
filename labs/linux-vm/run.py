@@ -14,7 +14,7 @@ import time
 
 
 class Objects(HTTPServer):
-    def __init__(self):
+    def __init__(self, outage_seconds):
         super().__init__(('127.0.0.1', 0), Handler)
         self.objects = {}
         self.reads = 0
@@ -22,6 +22,7 @@ class Objects(HTTPServer):
         self.drops = 0
         self.arm = threading.Event()
         self.offline_until = 0.0
+        self.outage_seconds = outage_seconds
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -32,7 +33,7 @@ class Handler(BaseHTTPRequestHandler):
         now = time.monotonic()
         if self.command == 'GET' and self.server.arm.is_set():
             self.server.arm.clear()
-            self.server.offline_until = now + 1
+            self.server.offline_until = now + self.server.outage_seconds
         if now >= self.server.offline_until:
             return False
         self.server.drops += 1
@@ -102,8 +103,8 @@ def observe(vm, log, objects, outage):
     return objects.reads - reads_before, round(time.monotonic() - ready, 3)
 
 
-def run_case(args, name):
-    objects = Objects()
+def run_case(args, name, outage_seconds, read_retry_seconds, expect_survival):
+    objects = Objects(outage_seconds)
     worker = threading.Thread(target=objects.serve_forever, daemon=True)
     worker.start()
     port = str(objects.server_address[1])
@@ -115,7 +116,9 @@ def run_case(args, name):
             with (args.results / f'{name}-gateway.log').open('wb') as gateway_log:
                 gateway = subprocess.Popen(['nbdkit', '-f', '-U', str(nbd), 'python', str(lab / 'gateway.py')],
                                            stdout=gateway_log, stderr=subprocess.STDOUT,
-                                           env={**os.environ, 'CLOUDSWAP_LAB_PORT': port, 'NO_PROXY': '127.0.0.1'})
+                                           env={**os.environ, 'CLOUDSWAP_LAB_PORT': port,
+                                                'CLOUDSWAP_LAB_READ_RETRY': str(read_retry_seconds),
+                                                'NO_PROXY': '127.0.0.1'})
                 try:
                     for _ in range(100):
                         if nbd.exists():
@@ -133,7 +136,7 @@ def run_case(args, name):
                     with case_log.open('wb') as log, subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                                                         stderr=subprocess.STDOUT) as vm:
                         try:
-                            reads, elapsed = observe(vm, log, objects, name == 'outage')
+                            reads, elapsed = observe(vm, log, objects, outage_seconds > 0)
                         finally:
                             if vm.poll() is None:
                                 vm.kill()
@@ -154,14 +157,17 @@ def run_case(args, name):
     status = int(status_match.group(1)) if status_match else None
     verified = 'DATA_VERIFIED swapins=' in report
     result = {'case': name, 'verified': verified, 'guest_status': status, 'object_writes': objects.writes,
-              'object_reads_during_verify': reads, 'dropped_http_requests': objects.drops, 'verify_seconds': elapsed}
+              'object_reads_during_verify': reads, 'dropped_http_requests': objects.drops, 'ready_to_exit_seconds': elapsed,
+              'configured_outage_seconds': outage_seconds, 'read_retry_seconds': read_retry_seconds}
     print(json.dumps(result), flush=True)
     (args.results / f'{name}.json').write_text(json.dumps(result, indent=2) + '\n')
-    if name == 'baseline':
+    if outage_seconds and objects.drops == 0:
+        raise RuntimeError('outage was never exercised by guest page-in')
+    if expect_survival:
         if status != 0 or not verified or reads == 0 or objects.writes == 0:
-            raise RuntimeError('baseline did not demonstrate kernel swap and intact read-back')
-    elif objects.drops == 0 or (status == 0 and (not verified or reads == 0)) or status not in (0, 135, 137, 139):
-        raise RuntimeError('outage outcome was not a verified read-back or an observed process failure')
+            raise RuntimeError('expected intact kernel swap read-back')
+    elif status != 135 or verified:
+        raise RuntimeError('expected a guest SIGBUS after a failed demand read')
 
 
 def main():
@@ -171,9 +177,15 @@ def main():
     parser.add_argument('--results', type=Path, required=True)
     args = parser.parse_args()
     args.results.mkdir(parents=True, exist_ok=True)
-    for name in ('baseline', 'outage'):
+    cases = [
+        ('baseline', 0, 0, True),
+        ('fail-fast', 1, 0, False),
+        ('retry-short', 1, 2.5, True),
+        ('retry-long', 4, 2.5, False),
+    ]
+    for name, duration, retry, expect_survival in cases:
         try:
-            run_case(args, name)
+            run_case(args, name, duration, retry, expect_survival)
         except Exception:
             for kind in ('guest', 'gateway'):
                 path = args.results / f'{name}-{kind}.log'

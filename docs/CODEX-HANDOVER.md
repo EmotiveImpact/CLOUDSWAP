@@ -8,7 +8,7 @@ Updated 10 November 2026. Read this before continuing CLOUDSWAP.
 - Last tested implementation commit: `dc57860314fb3a16468fd23258770610f6e111ad`.
 - PR #1 merged at `7baee59f386abfb391cd6a377228a4034880da18`. All three CI workflows passed on its final head `1448df929e44dadabfe5dfa5c0464eb7eed95665`. Start new work from current `main`, inspect the working tree, and use a new feature branch.
 - Read [chat context](CHAT-CONTEXT.md), [external storage](EXTERNAL-STORAGE.md), [validation](VALIDATION.md), [work packages](WORK-PACKAGES.md) and [research](../research/RESEARCH.md).
-- The original session's local checkout was behind the remote branch, with tracked edits and untracked Linux lab files. Prefer a fresh recursive checkout of remote main. Preserve local changes if reusing that checkout.
+- The original session's local checkout was behind the remote branch, with tracked edits and untracked Linux lab files. Prefer a fresh checkout of remote main. Preserve local changes if reusing that checkout.
 
 ## What works, precisely
 | Capability | Status |
@@ -50,7 +50,7 @@ External and cloud backends are not a finished automatic two-tier swap product. 
 ## Build and run
 On a suitable Mac with Xcode command-line tools and Rust configured:
 ```sh
-git clone --branch main --recurse-submodules https://github.com/EmotiveImpact/CLOUDSWAP.git
+git clone --branch main https://github.com/EmotiveImpact/CLOUDSWAP.git
 cd CLOUDSWAP
 cargo test --offline
 swift test --package-path apps/macos
@@ -67,7 +67,7 @@ Live R2 needs `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_
 
 ## Kernel mining update
 
-Pinned clones of XNU (host-matching and newer revisions), ipsw, symbolicator and Apple's system_cmds are now attached as submodules under `research/kernel-sources`. Initialise them with `git submodule update --init --recursive`. Read [kernel findings](../research/kernel/FINDINGS.md) and [multi-Mac testing](MULTI-MAC-TEST-PLAN.md).
+Pinned clones of XNU (host-matching and newer revisions), ipsw, symbolicator and Apple's system_cmds are now attached as submodules under `research/kernel-sources`. Initialise them with `git submodule update --init --depth 1 -- research/kernel-sources`. Read [kernel findings](../research/kernel/FINDINGS.md) and [multi-Mac testing](MULTI-MAC-TEST-PLAN.md).
 
 Apple's dynamic_pager source also writes this prefix, but its cleanup can unlink swap-prefixed files and its exit code does not reliably indicate success. Do not run it as a casual live-migration command. Both reviewed XNU revisions register `vm.swapfileprefix` as a writable string. Investigate this existing control point on an isolated system before assuming a custom driver is mandatory. Local read access was denied, so runtime support remains unverified. The unsupported old swapon API alone does not rule this candidate out. No swap configuration has been changed.
 
@@ -84,3 +84,7 @@ Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only 
 8. Keep Cairn file offloading separate until durable file restore, keys, metadata and consent are designed.
 
 User expects continued implementation and testing without repeated requests to proceed. Report genuine missing access/hardware/credentials precisely. Do not equate passing storage tests with a completed Mac swap product.
+
+## Expanded memory-disaggregation research
+
+See [the 23-repository collection](../research/disaggregation/README.md) and [findings/reuse plan](../research/disaggregation/FINDINGS.md). All references are pinned; only r3map, ram-dl and fastswap were additionally downloaded and selectively code-reviewed in this pass. Avoid global recursive submodule checkout because several upstream projects contain complete kernels. Use the selective commands in that README. The survey does not change the unverified status of native Mac system-swap attachment.

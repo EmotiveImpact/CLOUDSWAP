@@ -1,0 +1,61 @@
+{
+  "acquired": "2026-11-10",
+  "topic": "https://github.com/topics/fuse",
+  "scope": "Six selected repositories, not the full topic",
+  "repositories": [
+    {
+      "repository": "macfuse/macfuse",
+      "url": "https://github.com/macfuse/macfuse.git",
+      "commit": "cd4415f0bd86904b871b2512489ec79ebdd9c215",
+      "tree": "dfeaa10ef5f8046c8ea0db1f686908fa452046f9",
+      "path": "research/fuse/sources/macfuse--macfuse",
+      "checkout_status": "pinned_not_downloaded",
+      "review_scope": "README and project documentation; no runtime validation"
+    },
+    {
+      "repository": "macos-fuse-t/fuse-t",
+      "url": "https://github.com/macos-fuse-t/fuse-t.git",
+      "commit": "4a3ed37741f6415a97d77d8170dbe5d98c6c722d",
+      "tree": "b33dd6e53db2b0e1003b3ad4be382000869174d7",
+      "path": "research/fuse/sources/macos-fuse-t--fuse-t",
+      "checkout_status": "pinned_not_downloaded",
+      "review_scope": "README and project documentation; no runtime validation"
+    },
+    {
+      "repository": "rclone/rclone",
+      "url": "https://github.com/rclone/rclone.git",
+      "commit": "cbc8c3fbd9efee1bd526321e25c87caff8e2bc60",
+      "tree": "9d5ee46ebcd0c3c89590f7d2d195c5f3ca66dec0",
+      "path": "research/fuse/sources/rclone--rclone",
+      "checkout_status": "pinned_not_downloaded",
+      "review_scope": "README and project documentation; no runtime validation"
+    },
+    {
+      "repository": "s3fs-fuse/s3fs-fuse",
+      "url": "https://github.com/s3fs-fuse/s3fs-fuse.git",
+      "commit": "6ac9c17e231a5d321dedaabfee4dbd3aa0e263c8",
+      "tree": "546e010490d0793683d6658853bb7570143acb9e",
+      "path": "research/fuse/sources/s3fs-fuse--s3fs-fuse",
+      "checkout_status": "pinned_not_downloaded",
+      "review_scope": "README and project documentation; no runtime validation"
+    },
+    {
+      "repository": "Barre/ZeroFS",
+      "url": "https://github.com/Barre/ZeroFS.git",
+      "commit": "d261e6a7e909a914862120a103863891f17c9a83",
+      "tree": "6f339783469ed42b2098f035301f8bcdef2aebea",
+      "path": "research/fuse/sources/Barre--ZeroFS",
+      "checkout_status": "pinned_not_downloaded",
+      "review_scope": "README and project documentation; no runtime validation"
+    },
+    {
+      "repository": "cberner/fuser",
+      "url": "https://github.com/cberner/fuser.git",
+      "commit": "c0420fc49d3f1ce09603beb127f392eb2726c2a1",
+      "tree": "372c8f1fd86c797296d920d6671e657e85824864",
+      "path": "research/fuse/sources/cberner--fuser",
+      "checkout_status": "pinned_not_downloaded",
+      "review_scope": "README and project documentation; no runtime validation"
+    }
+  ]
+}

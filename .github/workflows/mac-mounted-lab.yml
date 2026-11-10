@@ -36,10 +36,15 @@ jobs:
           python3 scripts/mac-capabilities.py > lab-results/capabilities-user.json
           sudo -n python3 scripts/mac-capabilities.py > lab-results/capabilities-root.json
           cat lab-results/capabilities-root.json
+          sudo -n env GITHUB_ACTIONS=true RUNNER_ENVIRONMENT=github-hosted GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
+            python3 labs/macos-nfs/ci-prefix-probe.py --ci > lab-results/prefix-write-probe.json
+          cat lab-results/prefix-write-probe.json
       - uses: actions/upload-artifact@v4
         with:
           name: capabilities-${{ matrix.runner }}
-          path: lab-results/capabilities-*.json
+          path: |
+            lab-results/capabilities-*.json
+            lab-results/prefix-write-probe.json
       - name: Actual mount, fsync, unmount and fresh-process reopen
         run: |
           python3 labs/macos-nfs/lab.py --ci --mount \

@@ -153,3 +153,6 @@
 [submodule "research/fuse/sources/cberner--fuser"]
 	path = research/fuse/sources/cberner--fuser
 	url = https://github.com/cberner/fuser.git
+[submodule "research/kernel-sources/apple-nfs"]
+	path = research/kernel-sources/apple-nfs
+	url = https://github.com/apple-oss-distributions/NFS.git

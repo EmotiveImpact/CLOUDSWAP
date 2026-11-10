@@ -51,6 +51,17 @@
       "licence_file": "APPLE_LICENSE",
       "licence_sha256": "99ddf37269bd2cee75d02d89b443a137ec9899a50519a4af5fc0c6fd2fd18150",
       "purpose": "Apple userspace dynamic_pager prefix-setting and cleanup behaviour"
+    },
+    {
+      "name": "apple-nfs",
+      "url": "https://github.com/apple-oss-distributions/NFS.git",
+      "commit": "93733ffccece4daee73bf6306b291d1ae69130c0",
+      "tree": "1e79dd8fe965f4eadc656c55dfb77e3f7d5c07b6",
+      "tracked_files": 195,
+      "licence_file": "kext/nfs_vnops.c",
+      "licence_sha256": "d7fd528e7f68cd115857760b8cd7fe12cb67a6ff012d4ede725edf6ec04900c5",
+      "licence_note": "Per-file Apple Public Source Licence 2.0 and BSD notices; licence-bearing source file retained unchanged. Inspect all applicable file notices before reuse.",
+      "purpose": "Published Apple NFS client: vnode page-in/page-out and mount/unmount implementation; not proved binary-matched to any test host"
     }
   ]
 }

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "collected_at_utc": "2026-11-10T15:07:08.126241+00:00",
+  "observations": {
+    "architecture": {
+      "state": "observed",
+      "value": "x86_64"
+    },
+    "darwin_release": {
+      "state": "observed",
+      "value": "24.6.0"
+    },
+    "kernel_build": {
+      "state": "observed",
+      "xnu_version": "11417.140.69.711.44",
+      "release_kernel": true
+    },
+    "macos_version": {
+      "state": "observed",
+      "value": "15.7.9"
+    },
+    "macos_build": {
+      "state": "observed",
+      "value": "24G830"
+    },
+    "model": {
+      "state": "observed",
+      "value": "Macmini6,2"
+    },
+    "memory_bytes": {
+      "state": "observed",
+      "value": "15032385536"
+    },
+    "page_bytes": {
+      "state": "observed",
+      "value": "4096"
+    },
+    "swapfileprefix": {
+      "state": "observed",
+      "value": "/System/Volumes/VM/swapfile"
+    },
+    "swap_usage": {
+      "state": "observed",
+      "value": "total = 0.00M  used = 0.00M  free = 0.00M  (encrypted)"
+    }
+  },
+  "system_swap_modified": false,
+  "external_swap_verified": false,
+  "cloud_swap_verified": false,
+  "capability_verdict": "unverified",
+  "manual_evidence_needed": [
+    "startup security policy",
+    "physical or virtual machine",
+    "external drive protocol and filesystem",
+    "actual target-volume paging traces"
+  ],
+  "evidence_source": {
+    "run_id": 42840558233,
+    "job_id": 129914325834,
+    "artifact_id": 13775828540,
+    "revision": "e58429d2d487da8efec900b20ef2e3a28c38a58d",
+    "hosted_runner": true
+  }
+}

@@ -231,15 +231,20 @@ def io_worker(stage, filename):
             for position in range(0, CAPACITY, CHUNK):
                 count = os.pwrite(fd, initial[position:position + CHUNK], position)
                 if count != CHUNK: raise OSError('Short mounted write')
-            # Crosses two native pages and tests read-modify-write through the mount.
+            # Dirty a file-backed mapping across two native pages, then sync it.
             patch = expected[16380:16420]
-            if os.pwrite(fd, patch, 16380) != len(patch): raise OSError('Short unaligned write')
+            with mmap.mmap(fd, CAPACITY, access=mmap.ACCESS_WRITE) as mapped:
+                mapped[16380:16420] = patch
+                mapped.flush()
             os.fsync(fd)
-        restored = b''.join(os.pread(fd, CHUNK, p) for p in range(0, CAPACITY, CHUNK))
-        if restored != expected: raise ValueError('Mounted file integrity failure')
+        # Verify the mapping before pread so the fresh-mount phases cannot pass
+        # merely because this worker already warmed every page through pread.
         with mmap.mmap(fd, CAPACITY, access=mmap.ACCESS_READ) as mapped:
             if mapped[:] != expected: raise ValueError('Mounted mmap integrity failure')
+        restored = b''.join(os.pread(fd, CHUNK, p) for p in range(0, CAPACITY, CHUNK))
+        if restored != expected: raise ValueError('Mounted file integrity failure')
         return {'passed': True, 'bytes_verified': len(restored), 'mmap_read_verified': True,
+                'mmap_write_and_msync': stage == 'write',
                 'sha256': hashlib.sha256(restored).hexdigest()}
     finally: os.close(fd)
 

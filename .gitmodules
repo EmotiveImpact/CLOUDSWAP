@@ -17,3 +17,23 @@
 [submodule "research/kernel-sources/system_cmds"]
 	path = research/kernel-sources/system_cmds
 	url = https://github.com/apple-oss-distributions/system_cmds.git
+
+[submodule "research/mac-candidates/sources/acidanthera--MacKernelSDK"]
+	path = research/mac-candidates/sources/acidanthera--MacKernelSDK
+	url = https://github.com/acidanthera/MacKernelSDK.git
+
+[submodule "research/mac-candidates/sources/apple--darwin-xnu"]
+	path = research/mac-candidates/sources/apple--darwin-xnu
+	url = https://github.com/apple/darwin-xnu.git
+
+[submodule "research/mac-candidates/sources/wolffcatskyy--linux-mac"]
+	path = research/mac-candidates/sources/wolffcatskyy--linux-mac
+	url = https://github.com/wolffcatskyy/linux-mac.git
+
+[submodule "research/mac-candidates/sources/apple--containerization"]
+	path = research/mac-candidates/sources/apple--containerization
+	url = https://github.com/apple/containerization.git
+
+[submodule "research/mac-candidates/sources/elliotnunn--NanoKernel"]
+	path = research/mac-candidates/sources/elliotnunn--NanoKernel
+	url = https://github.com/elliotnunn/NanoKernel.git

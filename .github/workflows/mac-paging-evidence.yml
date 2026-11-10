@@ -1,0 +1,25 @@
+name: Verify Mac paging evidence
+on:
+  pull_request:
+    paths:
+      - '.gitmodules'
+      - 'research/mac-candidates/**'
+      - 'scripts/mac-swap-evidence.py'
+      - 'scripts/verify-mac-candidates.py'
+      - 'scripts/tests/**'
+      - '.github/workflows/mac-paging-evidence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  evidence:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 scripts/verify-mac-candidates.py
+      - run: python3 -m unittest discover -s scripts/tests -v

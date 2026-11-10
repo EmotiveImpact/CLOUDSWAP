@@ -41,6 +41,16 @@
       "licence_file": "LICENSE",
       "licence_sha256": "0f80d7de4f5110c966dd3b2b7f7f13579dcd58fca77c6e95cd9ffc58a168f90b",
       "purpose": "Pinned research snapshot"
+    },
+    {
+      "name": "system_cmds",
+      "url": "https://github.com/apple-oss-distributions/system_cmds.git",
+      "commit": "408bba7453608006b89772db185defbac8fe2fd0",
+      "tree": "4565845129f748cb8fe3e3648ed9d3771431d276",
+      "tracked_files": 277,
+      "licence_file": "APPLE_LICENSE",
+      "licence_sha256": "99ddf37269bd2cee75d02d89b443a137ec9899a50519a4af5fc0c6fd2fd18150",
+      "purpose": "Apple userspace dynamic_pager prefix-setting and cleanup behaviour"
     }
   ]
 }

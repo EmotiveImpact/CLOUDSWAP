@@ -67,9 +67,9 @@ Live R2 needs `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_
 
 ## Kernel mining update
 
-Pinned clones of XNU (host-matching and newer revisions), ipsw and symbolicator are now attached as submodules under `research/kernel-sources`. Initialise them with `git submodule update --init --recursive`. Read [kernel findings](../research/kernel/FINDINGS.md) and [multi-Mac testing](MULTI-MAC-TEST-PLAN.md).
+Pinned clones of XNU (host-matching and newer revisions), ipsw, symbolicator and Apple's system_cmds are now attached as submodules under `research/kernel-sources`. Initialise them with `git submodule update --init --recursive`. Read [kernel findings](../research/kernel/FINDINGS.md) and [multi-Mac testing](MULTI-MAC-TEST-PLAN.md).
 
-Both reviewed XNU revisions register `vm.swapfileprefix` as a writable string. Investigate this existing control point on an isolated system before assuming a custom driver is mandatory. Local read access was denied, so runtime support remains unverified. The unsupported old swapon API alone does not rule this candidate out. No swap configuration has been changed.
+Apple's dynamic_pager source also writes this prefix, but its cleanup can unlink swap-prefixed files and its exit code does not reliably indicate success. Do not run it as a casual live-migration command. Both reviewed XNU revisions register `vm.swapfileprefix` as a writable string. Investigate this existing control point on an isolated system before assuming a custom driver is mandatory. Local read access was denied, so runtime support remains unverified. The unsupported old swapon API alone does not rule this candidate out. No swap configuration has been changed.
 
 Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only report. Separate physical tests from VM/CI evidence. Source map generation, pinned-checkout checks and four diagnostic regression tests are included.
 

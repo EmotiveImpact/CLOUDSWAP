@@ -43,3 +43,13 @@ A regular external APFS volume should be investigated before inventing a cloud b
 6. Reboot into a known-good environment for recovery when appropriate; do not unplug a drive holding live pages or assume restoring the prefix makes unplugging safe.
 
 If the prefix path works safely, build the narrowly scoped privileged integration around the proven mechanism. If it fails, record the exact policy/filesystem/initialisation blocker and then assess DriverKit or other approaches. Cloud remains a later storage and failure-handling problem. No claim of Mac swap relocation is made by this report.
+
+## Apple userspace implementation found during follow-up
+
+A fourth upstream repository, [apple-oss-distributions/system_cmds](https://github.com/apple-oss-distributions/system_cmds), is pinned at 408bba7453608006b89772db185defbac8fe2fd0. Its [dynamic_pager.c](https://github.com/apple-oss-distributions/system_cmds/blob/408bba7453608006b89772db185defbac8fe2fd0/dynamic_pager/dynamic_pager.c#L73) writes vm.swapfileprefix when passed a filename prefix. The accompanying manual documents the -F option. The manual's default path is historical, so the kernel source and actual target must determine the current default.
+
+This strengthens the candidate beyond an isolated sysctl declaration: Apple has userspace code that uses it. It still does not establish externally mounted volume acceptance, live migration, supported startup integration or safe recovery on any shipping build.
+
+The same source deliberately exits successfully even on certain failures. It also unlinks directory entries whose names start with swap. Therefore a zero exit status cannot establish that placement worked, and invoking it against an ordinary directory could delete unrelated files with matching names. It is intended for boot-time use; do not casually restart it or use it as a live migration tool.
+
+Read-only inspection of /sbin/dynamic_pager on the observed 14.5 host found the swapfileprefix and error-message strings. Its SHA-256 was 9bf7cbf5ac838a6e6a3cae4bb50881df3f84b46ab0851ccde0e0e8c14bc82817. The executable was not run, decompiled or proved identical to the pinned source. No privileged write was attempted.

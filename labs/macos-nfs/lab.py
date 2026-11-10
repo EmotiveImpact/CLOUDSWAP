@@ -289,7 +289,17 @@ def mount_trial(binary, helper, root, env, ci):
                     'blocked_until_resumed': True, 'physical_wifi_drop': False}
                 worker = subprocess.CompletedProcess(worker_args, worker_process.returncode, stdout, stderr)
             else:
-                worker = subprocess.run(worker_args, capture_output=True, text=True, timeout=90)
+                worker_process = subprocess.Popen(worker_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                try:
+                    stdout, stderr = worker_process.communicate(timeout=90)
+                except subprocess.TimeoutExpired:
+                    # A process blocked in mounted I/O may not exit on SIGKILL
+                    # until the filesystem is detached. Do not wait forever.
+                    unmount()
+                    worker_process.kill()
+                    worker_process.communicate(timeout=5)
+                    raise
+                worker = subprocess.CompletedProcess(worker_args, worker_process.returncode, stdout, stderr)
             if worker.returncode: raise OSError('Mounted I/O worker failed: ' + worker.stderr[-500:])
             report[stage] = json.loads(worker.stdout)
             unmount(); server.stop(); server = None

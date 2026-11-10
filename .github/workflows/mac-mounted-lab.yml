@@ -27,6 +27,7 @@ jobs:
         run: swift build --package-path apps/macos --configuration release --product R2Lab
       - name: Build and test Rust NFS bridge
         run: |
+          python3 labs/macos-nfs/verify-source.py
           cargo test --locked --manifest-path labs/macos-nfs/Cargo.toml
           cargo build --locked --release --manifest-path labs/macos-nfs/Cargo.toml
       - name: Read kernel capabilities as runner user and root

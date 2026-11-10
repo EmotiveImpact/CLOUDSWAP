@@ -1,0 +1,105 @@
+{
+  "acquired": "2026-11-10",
+  "repositories": [
+    {
+      "repository": "acidanthera/MacKernelSDK",
+      "commit": "3f750085caa17ec3a7880f11c11bf4f48cd6a164",
+      "tree": "ef361592c6340fe53560a8aba98619da641ed437",
+      "url": "https://github.com/acidanthera/MacKernelSDK.git",
+      "path": "research/mac-candidates/sources/acidanthera--MacKernelSDK",
+      "root_documents": [
+        {
+          "path": "LICENSE.txt",
+          "blob": "fe81a60cae982c042a69f97623b427666c455093",
+          "size": 19829
+        },
+        {
+          "path": "README.md",
+          "blob": "7fceac107c004a06964d41f061791e263340ba69",
+          "size": 6063
+        }
+      ],
+      "licence_status": "notice_found_review_required"
+    },
+    {
+      "repository": "apple/darwin-xnu",
+      "commit": "2ff845c2e033bd0ff64b5b6aa6063a1f8f65aa32",
+      "tree": "1f2b270cf2aa875e1cbbaef1ebd043b08c862bd8",
+      "url": "https://github.com/apple/darwin-xnu.git",
+      "path": "research/mac-candidates/sources/apple--darwin-xnu",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "fe81a60cae982c042a69f97623b427666c455093",
+          "size": 19829
+        },
+        {
+          "path": "README.md",
+          "blob": "da6bb7bc15a8eec1644a6223709f21f3be93dbae",
+          "size": 19485
+        }
+      ],
+      "licence_status": "notice_found_review_required"
+    },
+    {
+      "repository": "wolffcatskyy/linux-mac",
+      "commit": "175d4c34daaef173c914f264c008f5bacf9d8ec8",
+      "tree": "cd9ce694a8c448e54aa98bc0ef242c065b8c0ce8",
+      "url": "https://github.com/wolffcatskyy/linux-mac.git",
+      "path": "research/mac-candidates/sources/wolffcatskyy--linux-mac",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "eef4a921e7963a94efe17506bec855920aa0b11b",
+          "size": 1282
+        },
+        {
+          "path": "README.md",
+          "blob": "2c8df59a06e0f509b36adde84a6ada6704584761",
+          "size": 1006
+        }
+      ],
+      "licence_status": "notice_found_review_required"
+    },
+    {
+      "repository": "apple/containerization",
+      "commit": "fd4a84a9aa85c717bd502c585c29b910fdde817a",
+      "tree": "7688cfcff98209c1533468caa8c78757df773bfa",
+      "url": "https://github.com/apple/containerization.git",
+      "path": "research/mac-candidates/sources/apple--containerization",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "7a4a3ea2424c09fbe48d455aed1eaa94d9124835",
+          "size": 11357
+        },
+        {
+          "path": "README.md",
+          "blob": "f658b08ddadf787997ad24b6b6cd4b05ca476f8a",
+          "size": 9289
+        },
+        {
+          "path": "licenserc.toml",
+          "blob": "43b81fcf308211d0de1b67a7db066822a33b3621",
+          "size": 453
+        }
+      ],
+      "licence_status": "notice_found_review_required"
+    },
+    {
+      "repository": "elliotnunn/NanoKernel",
+      "commit": "b2b5613a103a1bac576ea6c8bc83b391f03ea22b",
+      "tree": "d614f7e398772420d21a45935a7a3525cc5fd7a7",
+      "url": "https://github.com/elliotnunn/NanoKernel.git",
+      "path": "research/mac-candidates/sources/elliotnunn--NanoKernel",
+      "root_documents": [
+        {
+          "path": "ReadMe.md",
+          "blob": "206c1dbb8629faf2bb0f68657e2947d11aeab271",
+          "size": 1964
+        }
+      ],
+      "licence_status": "no_root_notice_captured_review_required"
+    }
+  ]
+}

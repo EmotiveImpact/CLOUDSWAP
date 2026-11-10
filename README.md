@@ -45,4 +45,20 @@ Cairn may later reuse cloud storage and retrieval components for file offloading
 
 ## Kernel research and multiple Macs
 
-Pinned XNU, ipsw and symbolicator source checkouts are included as Git submodules. Run `git submodule update --init --recursive` to fetch them. Read the [kernel source findings](research/kernel/FINDINGS.md) and [multi-Mac test plan](docs/MULTI-MAC-TEST-PLAN.md). The newly identified `vm.swapfileprefix` candidate is unverified on a running target; no system swap changes have been made. `python3 scripts/mac-capabilities.py` collects a read-only report for each test Mac.
+Pinned XNU, ipsw and symbolicator source checkouts are included as Git submodules. Run `git submodule update --init --depth 1 -- research/kernel-sources` to fetch them. Read the [kernel source findings](research/kernel/FINDINGS.md) and [multi-Mac test plan](docs/MULTI-MAC-TEST-PLAN.md). The newly identified `vm.swapfileprefix` candidate is unverified on a running target; no system swap changes have been made. `python3 scripts/mac-capabilities.py` collects a read-only report for each test Mac.
+
+The [expanded disaggregated-memory collection](research/disaggregation/README.md) pins 23 upstream repositories and records their relevance, platform dependencies and reuse experiments. Download these selectively to avoid filling your Mac with upstream kernel trees.
+
+Additional [Mac kernel candidates](research/mac-candidates/README.md) are pinned separately. The [read-only swap-evidence collector](docs/MAC-SWAP-EVIDENCE.md) measures candidate placement without changing system swap.
+
+Use the [combined cloud and local-mirror trial](docs/TIERED-STORAGE-TRIAL.md) to verify remote reads, simulated offline recovery, failed-write handling and allocated file sizes. Available through the Mac menu or R2Lab CLI.
+
+See the [FUSE feasibility review](research/fuse/README.md) for six pinned filesystem candidates, cache-space risks, flush semantics and the remaining Mac paging gate.
+
+### Native encrypted file adapter
+
+`labs/macos-fuse` now provides an experimental fixed-size FUSE frontend and a
+native helper protocol over local/external, remote and mirrored page backends.
+[Run instructions and limits](labs/macos-fuse/README.md) and
+[verification evidence](labs/macos-fuse/validation.json) distinguish tested
+callbacks and process recovery from the still-unverified mount and Mac swap path.

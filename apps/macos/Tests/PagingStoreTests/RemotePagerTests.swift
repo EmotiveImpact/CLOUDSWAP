@@ -17,6 +17,8 @@ actor MemoryObjects: ObjectBackend {
         guard let data = objects[key] else { throw PagingError.missing }
         return data
     }
+    func snapshot() -> [String: Data] { objects }
+    func replace(_ replacement: [String: Data]) { objects = replacement }
     func corrupt() { for key in objects.keys { objects[key] = Data(repeating: 0, count: 100) } }
 }
 final class RemotePagerTests: XCTestCase {
@@ -118,6 +120,57 @@ final class RemotePagerTests: XCTestCase {
         try Data(repeating: 0, count: 100).write(to: object)
         await backend.fault(offline: true)
         do { _ = try await pager.read(block: 0); XCTFail("Corrupt mirror accepted") } catch { }
+    }
+
+    func testMissingCommittedPageFailsAndCanRecover() async throws {
+        let backend = MemoryObjects()
+        let pager = try RemotePager(directory: root, key: key, backend: backend, create: true)
+        try await pager.write(block: 0, data: payload)
+        let original = await backend.snapshot()
+        await backend.replace([:])
+        do { _ = try await pager.read(block: 0); XCTFail("Missing page accepted") }
+        catch PagingError.unavailable { }
+        await backend.replace(original)
+        let restored = try await pager.read(block: 0)
+        XCTAssertEqual(restored, payload)
+    }
+    func testTruncatedAndOversizedPagesAreRejected() async throws {
+        let backend = MemoryObjects()
+        let pager = try RemotePager(directory: root, key: key, backend: backend, create: true)
+        try await pager.write(block: 0, data: payload)
+        let original = await backend.snapshot()
+        for size in [0, 27, PagingStore.blockSize + 27, PagingStore.blockSize + 29] {
+            await backend.replace(original.mapValues { Data($0.prefix(size)) + Data(repeating: 0, count: max(0, size - $0.count)) })
+            do { _ = try await pager.read(block: 0); XCTFail("Invalid length accepted") }
+            catch PagingError.invalid { }
+        }
+        await backend.replace(original)
+        let restored = try await pager.read(block: 0)
+        XCTAssertEqual(restored, payload)
+    }
+    func testOldGenerationCannotReplaceCurrentPage() async throws {
+        let backend = MemoryObjects()
+        let pager = try RemotePager(directory: root, key: key, backend: backend, create: true)
+        try await pager.write(block: 0, data: payload)
+        let old = await backend.snapshot().values.first!
+        let replacement = Data(repeating: 0x33, count: PagingStore.blockSize)
+        try await pager.write(block: 0, data: replacement)
+        let current = await backend.snapshot()
+        await backend.replace(current.mapValues { _ in old })
+        do { _ = try await pager.read(block: 0); XCTFail("Stale generation accepted") } catch { }
+        await backend.replace(current)
+        let restored = try await pager.read(block: 0)
+        XCTAssertEqual(restored, replacement)
+    }
+    func testAnotherBlocksCiphertextCannotBeSubstituted() async throws {
+        let backend = MemoryObjects()
+        let pager = try RemotePager(directory: root, key: key, backend: backend, create: true)
+        try await pager.write(block: 0, data: payload)
+        let first = await backend.snapshot().values.first!
+        try await pager.write(block: 1, data: payload)
+        let originals = await backend.snapshot()
+        await backend.replace(originals.mapValues { _ in first })
+        do { _ = try await pager.read(block: 1); XCTFail("Wrong block accepted") } catch { }
     }
 
 }

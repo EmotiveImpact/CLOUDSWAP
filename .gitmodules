@@ -17,3 +17,139 @@
 [submodule "research/kernel-sources/system_cmds"]
 	path = research/kernel-sources/system_cmds
 	url = https://github.com/apple-oss-distributions/system_cmds.git
+
+[submodule "research/disaggregation/sources/SymbioticLab--Infiniswap"]
+	path = research/disaggregation/sources/SymbioticLab--Infiniswap
+	url = https://github.com/SymbioticLab/Infiniswap.git
+
+[submodule "research/disaggregation/sources/thustorage--Sherman"]
+	path = research/disaggregation/sources/thustorage--Sherman
+	url = https://github.com/thustorage/Sherman.git
+
+[submodule "research/disaggregation/sources/purduedb--OpenAurora"]
+	path = research/disaggregation/sources/purduedb--OpenAurora
+	url = https://github.com/purduedb/OpenAurora.git
+
+[submodule "research/disaggregation/sources/Amit-P89---DRackSim"]
+	path = research/disaggregation/sources/Amit-P89---DRackSim
+	url = https://github.com/Amit-P89/-DRackSim.git
+
+[submodule "research/disaggregation/sources/uclasystem--MemLiner"]
+	path = research/disaggregation/sources/uclasystem--MemLiner
+	url = https://github.com/uclasystem/MemLiner.git
+
+[submodule "research/disaggregation/sources/uclasystem--Mako"]
+	path = research/disaggregation/sources/uclasystem--Mako
+	url = https://github.com/uclasystem/Mako.git
+
+[submodule "research/disaggregation/sources/eniac--TELEPORT"]
+	path = research/disaggregation/sources/eniac--TELEPORT
+	url = https://github.com/eniac/TELEPORT.git
+
+[submodule "research/disaggregation/sources/Coekjan--CrossPool"]
+	path = research/disaggregation/sources/Coekjan--CrossPool
+	url = https://github.com/Coekjan/CrossPool.git
+
+[submodule "research/disaggregation/sources/DatabaseGroup--rdma-inverted-index"]
+	path = research/disaggregation/sources/DatabaseGroup--rdma-inverted-index
+	url = https://github.com/DatabaseGroup/rdma-inverted-index.git
+
+[submodule "research/disaggregation/sources/fukien--hashjoins-meet-cxl"]
+	path = research/disaggregation/sources/fukien--hashjoins-meet-cxl
+	url = https://github.com/fukien/hashjoins-meet-cxl.git
+
+[submodule "research/disaggregation/sources/engrtarun--T9-VirtualRAM"]
+	path = research/disaggregation/sources/engrtarun--T9-VirtualRAM
+	url = https://github.com/engrtarun/T9-VirtualRAM.git
+
+[submodule "research/disaggregation/sources/SymbioticLab--Leap"]
+	path = research/disaggregation/sources/SymbioticLab--Leap
+	url = https://github.com/SymbioticLab/Leap.git
+
+[submodule "research/disaggregation/sources/clusterfarmem--fastswap"]
+	path = research/disaggregation/sources/clusterfarmem--fastswap
+	url = https://github.com/clusterfarmem/fastswap.git
+
+[submodule "research/disaggregation/sources/uclasystem--canvas"]
+	path = research/disaggregation/sources/uclasystem--canvas
+	url = https://github.com/uclasystem/canvas.git
+
+[submodule "research/disaggregation/sources/AIFM-sys--AIFM"]
+	path = research/disaggregation/sources/AIFM-sys--AIFM
+	url = https://github.com/AIFM-sys/AIFM.git
+
+[submodule "research/disaggregation/sources/compiler-disagg--TrackFM"]
+	path = research/disaggregation/sources/compiler-disagg--TrackFM
+	url = https://github.com/compiler-disagg/TrackFM.git
+
+[submodule "research/disaggregation/sources/pojntfx--r3map"]
+	path = research/disaggregation/sources/pojntfx--r3map
+	url = https://github.com/pojntfx/r3map.git
+
+[submodule "research/disaggregation/sources/pojntfx--ram-dl"]
+	path = research/disaggregation/sources/pojntfx--ram-dl
+	url = https://github.com/pojntfx/ram-dl.git
+
+[submodule "research/disaggregation/sources/eden-farmem--eden"]
+	path = research/disaggregation/sources/eden-farmem--eden
+	url = https://github.com/eden-farmem/eden.git
+
+[submodule "research/disaggregation/sources/rimimadision--safe"]
+	path = research/disaggregation/sources/rimimadision--safe
+	url = https://github.com/rimimadision/safe.git
+
+[submodule "research/disaggregation/sources/llnl--umap"]
+	path = research/disaggregation/sources/llnl--umap
+	url = https://github.com/llnl/umap.git
+
+[submodule "research/disaggregation/sources/dmemsys--awesome-disaggregated-memory"]
+	path = research/disaggregation/sources/dmemsys--awesome-disaggregated-memory
+	url = https://github.com/dmemsys/awesome-disaggregated-memory.git
+
+[submodule "research/disaggregation/sources/eden-farmem--fltrace"]
+	path = research/disaggregation/sources/eden-farmem--fltrace
+	url = https://github.com/eden-farmem/fltrace.git
+
+[submodule "research/mac-candidates/sources/acidanthera--MacKernelSDK"]
+	path = research/mac-candidates/sources/acidanthera--MacKernelSDK
+	url = https://github.com/acidanthera/MacKernelSDK.git
+
+[submodule "research/mac-candidates/sources/apple--darwin-xnu"]
+	path = research/mac-candidates/sources/apple--darwin-xnu
+	url = https://github.com/apple/darwin-xnu.git
+
+[submodule "research/mac-candidates/sources/wolffcatskyy--linux-mac"]
+	path = research/mac-candidates/sources/wolffcatskyy--linux-mac
+	url = https://github.com/wolffcatskyy/linux-mac.git
+
+[submodule "research/mac-candidates/sources/apple--containerization"]
+	path = research/mac-candidates/sources/apple--containerization
+	url = https://github.com/apple/containerization.git
+
+[submodule "research/mac-candidates/sources/elliotnunn--NanoKernel"]
+	path = research/mac-candidates/sources/elliotnunn--NanoKernel
+	url = https://github.com/elliotnunn/NanoKernel.git
+
+[submodule "research/fuse/sources/macfuse--macfuse"]
+	path = research/fuse/sources/macfuse--macfuse
+	url = https://github.com/macfuse/macfuse.git
+
+[submodule "research/fuse/sources/macos-fuse-t--fuse-t"]
+	path = research/fuse/sources/macos-fuse-t--fuse-t
+	url = https://github.com/macos-fuse-t/fuse-t.git
+
+[submodule "research/fuse/sources/rclone--rclone"]
+	path = research/fuse/sources/rclone--rclone
+	url = https://github.com/rclone/rclone.git
+
+[submodule "research/fuse/sources/s3fs-fuse--s3fs-fuse"]
+	path = research/fuse/sources/s3fs-fuse--s3fs-fuse
+	url = https://github.com/s3fs-fuse/s3fs-fuse.git
+
+[submodule "research/fuse/sources/Barre--ZeroFS"]
+	path = research/fuse/sources/Barre--ZeroFS
+	url = https://github.com/Barre/ZeroFS.git
+
+[submodule "research/fuse/sources/cberner--fuser"]
+	path = research/fuse/sources/cberner--fuser
+	url = https://github.com/cberner/fuser.git

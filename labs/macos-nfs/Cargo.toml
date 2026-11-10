@@ -1,0 +1,15 @@
+[package]
+name = "cloudswap-nfs-lab"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+nfsserve = { path = "vendor/nfsserve" }
+async-trait = "0.1"
+tokio = { version = "1", features = ["rt-multi-thread", "process", "io-util", "time", "macros", "signal"] }
+serde_json = "1"
+base64 = "0.22"
+libc = "0.2"

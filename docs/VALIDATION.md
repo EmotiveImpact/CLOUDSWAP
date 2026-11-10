@@ -53,3 +53,28 @@ The [Linux kernel swap lab](https://github.com/EmotiveImpact/CLOUDSWAP/actions/w
 The [first run](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42817073745) recorded 6,120 page-outs and 6,151 page-ins in the healthy case. The probe verified all 24 MiB. With an immediate read failure during a one-second service disconnect, the workload received SIGBUS. The outage harness interrupts HTTP connections on loopback. R2 and physical network or drive loss still require separate trials.
 
 The lab compares a 2.5-second retry budget against one-second and four-second service outages. The native R2 pager applies the same budget to immutable page reads after transient network errors. HTTP responses such as 404 propagate immediately. Writes retain their existing uncertain-acknowledgement policy.
+
+## Remote-page integrity, 10 November 2026
+
+33 native XCTest tests passed (four new remote failure/substitution cases). The new cases reject missing committed objects, truncated/oversized responses, old-generation ciphertext at the current object name, and ciphertext substituted from another block. Missing-object and malformed-response recovery are checked after restoring the correct backend data. Tests use an in-memory backend and temporary directories, not live R2 or kernel paging. Both complete pinned XNU source trees and the other three kernel-research sources passed the existing source verifier.
+
+The macOS release app build, ad-hoc signature verification and packaged R2Lab cryptographic self-test also passed for this increment. No R2 requests were made.
+
+## Combined storage trial, 10 November 2026
+
+38 native tests passed (29 main-branch tests plus nine new lifecycle/transport cases). Release build, deep/strict signature check, existing helper self-tests and the packaged tiered synthetic trial passed. [The normalised report](evidence/tiered-release-simulation.json) records 64 remote writes/reads, offline mirror recovery, rejection of one offline write, last-committed-page recovery and successful object/file cleanup. This is simulated remote storage with real local encrypted files, not a live cloud, physical disconnect or system-swap test. See [trial documentation](TIERED-STORAGE-TRIAL.md) for scope and measurements.
+
+## Native encrypted file adapter (10 November 2026)
+
+Branch `feat/fuse-file-adapter`; see `labs/macos-fuse/README.md`. Test evidence is
+recorded in `labs/macos-fuse/validation.json`. The Python acceptance test invokes
+the actual filesystem callback class and launches the packaged native R2Lab
+helper, closes it, launches a second helper with the same caller-held key and
+verifies all 4 MiB. It does not mount FUSE. The failure suite also kills a real
+helper after acknowledged writes and checks recovery in a fresh process.
+
+No FUSE runtime was installed on the macOS 14.5 arm64 host. Live R2 configuration
+was absent. Physical drive disconnect, mounted kernel I/O, mmap, XNU swap
+selection, net SSD savings and multi-Mac behaviour remain unverified. Tests use
+synthetic content and temporary directories. Production key management and
+remote orphan reclamation remain open.

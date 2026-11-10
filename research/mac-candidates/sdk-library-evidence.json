@@ -1,0 +1,29 @@
+{
+  "commit": "3f750085caa17ec3a7880f11c11bf4f48cd6a164",
+  "method": "lipo -archs and SHA-256; no upstream code executed",
+  "libraries": [
+    {
+      "path": "Library/universal/libkmod.a",
+      "architectures": [
+        "x86_64",
+        "i386"
+      ],
+      "sha256": "a085dfd884e28d6fb69e1fb1e003b8bd928ce6d20a8699fa833f21b835a5fee7"
+    },
+    {
+      "path": "Library/universal/libkmodc++.a",
+      "architectures": [
+        "x86_64",
+        "i386"
+      ],
+      "sha256": "30f61831b7d0cb523b865de7cec09ab4771693a317ed1a165e69b91fa13e4650"
+    },
+    {
+      "path": "Library/x86_64/libkmod.a",
+      "architectures": [
+        "x86_64"
+      ],
+      "sha256": "7a751671bbe96c9c7b5416078df600b768c00c0dc5178d8acd8f52539c7ccd4e"
+    }
+  ]
+}

@@ -72,6 +72,11 @@ struct R2Client {
 
 @main struct R2Lab {
     static func main() async {
+        if CommandLine.arguments.contains("--tiered-self-test") || CommandLine.arguments.contains("--tiered-live") {
+            await tiered(); return
+        }
+
+        if CommandLine.arguments.contains("--file-server") { await fileServer(); return }
         if CommandLine.arguments.contains("--pager-live") { await pagerLive(); return }
         if CommandLine.arguments.contains("--self-test") {
             do {
@@ -198,5 +203,44 @@ extension R2Lab {
         if let b = backend { if !(await b.cleanup()) { passed = false } }
         try? FileManager.default.removeItem(at: root)
         if !passed { exit(1) }
+    }
+}
+
+
+extension R2Client: TrialObjectBackend {
+    func delete(key: String) async throws { _ = try await request("DELETE", key: key) }
+}
+
+extension R2Lab {
+    struct TieredOutput: Encodable {
+        let mode: String
+        let passed: Bool
+        let report: TieredTrialReport
+    }
+    static func tiered() async {
+        let args = Array(CommandLine.arguments.dropFirst())
+        let live = args.contains("--tiered-live")
+        let mode = live ? "--tiered-live" : "--tiered-self-test"
+        let parent: URL
+        if args == [mode], !live {
+            parent = FileManager.default.temporaryDirectory
+        } else if args.count == 3, args[0] == mode, args[1] == "--directory", !args[2].isEmpty {
+            parent = URL(fileURLWithPath: args[2], isDirectory: true)
+        } else {
+            print("Use --tiered-self-test [--directory EXISTING_FOLDER] or --tiered-live --directory EXISTING_FOLDER. Live mode uploads 1 MiB of synthetic encrypted pages and attempts cleanup.")
+            exit(2)
+        }
+        do {
+            let backend: TrialObjectBackend = live ? try R2Client() : TrialMemoryBackend()
+            let report = await TieredTrial.run(parent: parent, backend: backend)
+            let output = TieredOutput(mode: live ? "live_r2_with_simulated_outage" : "simulated_remote_with_real_local_mirror",
+                                      passed: report.passed, report: report)
+            let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            print(String(decoding: try encoder.encode(output), as: UTF8.self))
+            if !report.passed { exit(1) }
+        } catch {
+            print("Tiered trial configuration failed. No credentials are logged and no system swap was changed.")
+            exit(1)
+        }
     }
 }

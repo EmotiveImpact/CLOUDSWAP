@@ -8,7 +8,7 @@ Updated 10 November 2026. Read this before continuing CLOUDSWAP.
 - Last tested implementation commit: `dc57860314fb3a16468fd23258770610f6e111ad`.
 - PR #1 merged at `7baee59f386abfb391cd6a377228a4034880da18`. All three CI workflows passed on its final head `1448df929e44dadabfe5dfa5c0464eb7eed95665`. Start new work from current `main`, inspect the working tree, and use a new feature branch.
 - Read [chat context](CHAT-CONTEXT.md), [external storage](EXTERNAL-STORAGE.md), [validation](VALIDATION.md), [work packages](WORK-PACKAGES.md) and [research](../research/RESEARCH.md).
-- The original session's local checkout was behind the remote branch, with tracked edits and untracked Linux lab files. Prefer a fresh recursive checkout of remote main. Preserve local changes if reusing that checkout.
+- The original session's local checkout was behind the remote branch, with tracked edits and untracked Linux lab files. Prefer a fresh checkout of remote main. Preserve local changes if reusing that checkout.
 
 ## What works, precisely
 | Capability | Status |
@@ -50,7 +50,7 @@ External and cloud backends are not a finished automatic two-tier swap product. 
 ## Build and run
 On a suitable Mac with Xcode command-line tools and Rust configured:
 ```sh
-git clone --branch main --recurse-submodules https://github.com/EmotiveImpact/CLOUDSWAP.git
+git clone --branch main https://github.com/EmotiveImpact/CLOUDSWAP.git
 cd CLOUDSWAP
 cargo test --offline
 swift test --package-path apps/macos
@@ -67,7 +67,7 @@ Live R2 needs `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_
 
 ## Kernel mining update
 
-Pinned clones of XNU (host-matching and newer revisions), ipsw, symbolicator and Apple's system_cmds are now attached as submodules under `research/kernel-sources`. Initialise them with `git submodule update --init --recursive`. Read [kernel findings](../research/kernel/FINDINGS.md) and [multi-Mac testing](MULTI-MAC-TEST-PLAN.md).
+Pinned clones of XNU (host-matching and newer revisions), ipsw, symbolicator and Apple's system_cmds are now attached as submodules under `research/kernel-sources`. Initialise them with `git submodule update --init --depth 1 -- research/kernel-sources`. Read [kernel findings](../research/kernel/FINDINGS.md) and [multi-Mac testing](MULTI-MAC-TEST-PLAN.md).
 
 Apple's dynamic_pager source also writes this prefix, but its cleanup can unlink swap-prefixed files and its exit code does not reliably indicate success. Do not run it as a casual live-migration command. Both reviewed XNU revisions register `vm.swapfileprefix` as a writable string. Investigate this existing control point on an isolated system before assuming a custom driver is mandatory. Local read access was denied, so runtime support remains unverified. The unsupported old swapon API alone does not rule this candidate out. No swap configuration has been changed.
 
@@ -84,3 +84,34 @@ Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only 
 8. Keep Cairn file offloading separate until durable file restore, keys, metadata and consent are designed.
 
 User expects continued implementation and testing without repeated requests to proceed. Report genuine missing access/hardware/credentials precisely. Do not equate passing storage tests with a completed Mac swap product.
+
+## Expanded memory-disaggregation research
+
+See [the 23-repository collection](../research/disaggregation/README.md) and [findings/reuse plan](../research/disaggregation/FINDINGS.md). All references are pinned; only r3map, ram-dl and fastswap were additionally downloaded and selectively code-reviewed in this pass. Avoid global recursive submodule checkout because several upstream projects contain complete kernels. Use the selective commands in that README. The survey does not change the unverified status of native Mac system-swap attachment.
+
+## Kernel candidate assessment and integrity increment
+
+See [kernel project assessment](../research/kernel/PROJECT-ASSESSMENT.md) for the user's XNU, MacKernelSDK, linux-mac, Containerization and NanoKernel links. Both existing full published XNU snapshots were reverified. RemotePager now checks the exact combined AES-GCM page size before decrypting, including mirror reopen. Four added native regressions cover missing, malformed, stale and cross-block payloads; all 33 XCTest tests passed. This does not implement native system-swap attachment.
+
+## Mac candidate pins and placement evidence
+
+Five additional repositories are pinned in research/mac-candidates; MacKernelSDK is downloaded and its bundled libraries verified as Intel-only (x86_64/i386). Use docs/MAC-SWAP-EVIDENCE.md and scripts/mac-swap-evidence.py for read-only native test observations. 18 Python tests passed. Live snapshots saw swap-file metadata and counters but prefix and boot-session reads were denied, so comparison remained insufficient_evidence. No privileged swap changes were made.
+
+## Combined cloud and mirror trial
+
+See [TIERED-STORAGE-TRIAL.md](TIERED-STORAGE-TRIAL.md). The menu now includes a synthetic remote/offline-mirror trial using a selected local/external folder. R2Lab accepts --tiered-self-test and --tiered-live --directory EXISTING_FOLDER; the latter uses the real R2 adapter and an injected outage. Shared TieredTrial verifies remote reads separately from mirror reads, rejects offline writes, reopens the last committed page, measures allocated trial-file bytes and reports cleanup failures. Keys are ephemeral and reopen is within-process only. 38 native tests, the release build/signature and packaged synthetic trial passed. No credentials were available for a live R2 run. Native system swap remains unattached.
+
+## Native file adapter, 10 November 2026
+
+Branch `feat/fuse-file-adapter` adds an executable FUSE frontend, a bounded
+stdin/stdout server in R2Lab and `VirtualPageFile` over the local, remote and
+mirrored encrypted stores. Read [the adapter instructions](../labs/macos-fuse/README.md)
+for exact commands, key handling, storage contract and remaining gates. This is
+separate from PR #5's tiered trial and does not depend on that unmerged branch.
+
+The actual filesystem callbacks and helper-process restart are tested without a
+mount. The current Mac has no FUSE runtime, so mounting and compatibility of the
+pinned Python binding remain unverified. No native swap attachment, physical
+unplug result, live R2 result or internal-space saving is claimed. `*-create`
+rejects existing directories; a missing committed remote object no longer has
+unwritten-page semantics. The protocol and tests never persist the encryption key.

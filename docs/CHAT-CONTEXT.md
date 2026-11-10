@@ -55,3 +55,13 @@ The user explicitly requested that the project information from this chat be sav
 
 ## Working preferences
 Use British English. Communicate plainly and concisely. Avoid unnecessary em dashes and en dashes. Keep building and testing the authorised work; don't repeatedly ask whether to continue. Do not claim background work continues after a turn unless an actual running system supports it.
+
+## FUSE implementation follow-through
+
+The user supplied https://github.com/topics/fuse and asked to keep building.
+Research led to a native encrypted file adapter with an optional FUSE frontend,
+without replacing the native Mac swap objective with ordinary file offloading.
+The current development Mac lacks a FUSE runtime. Direct callback tests and real
+helper-process restart/failure tests are therefore recorded separately from a
+mounted filesystem and from kernel paging. The adapter is deliberately fixed at
+4 MiB while its failure semantics are tested. See `labs/macos-fuse/README.md`.

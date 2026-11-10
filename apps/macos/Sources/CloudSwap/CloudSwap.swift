@@ -76,6 +76,32 @@ struct LabResult: Decodable { let mode: String; let passed: Bool; let scenarios:
             running = false
         }
     }
+    func runMirrorLab() {
+        guard !running else { return }
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false
+        panel.prompt = "Test offline recovery"
+        panel.message = "Choose a local or external folder. Tests 1 MiB of encrypted pages against a simulated remote service, then verifies offline recovery from this folder. No R2 connection or system swap changes."
+        guard panel.runModal() == .OK, let selected = panel.url else { return }
+        running = true
+        scenarios = []
+        labStatus = "Testing remote reads, offline mirror and recovery…"
+        Task {
+            let report = await Task.detached {
+                await TieredTrial.run(parent: selected, backend: TrialMemoryBackend())
+            }.value
+            scenarios = report.stages.map { Scenario(name: $0, passed: true) }
+            if report.passed {
+                let size = ByteCountFormatter.string(fromByteCount: report.localAllocatedBytes, countStyle: .binary)
+                labStatus = "Passed: 1 MiB recovered offline; mirror files used \(size). Synthetic remote only. Test files removed; empty test folder retained."
+            } else {
+                labStatus = "Trial incomplete at \(report.failedStage ?? "cleanup"). Check \(URL(fileURLWithPath: report.directory).lastPathComponent) for retained synthetic files."
+            }
+            running = false
+        }
+    }
     func runLab() {
         guard !running else { return }
         running = true
@@ -128,6 +154,8 @@ struct LabResult: Decodable { let mode: String; let passed: Bool; let scenarios:
                 Button(monitor.running ? "Running…" : "Run connection-loss simulation") { monitor.runLab() }
                     .disabled(monitor.running)
                 Button("Test external drive folder…") { monitor.runDriveLab() }
+                    .disabled(monitor.running)
+                Button("Test offline mirror recovery…") { monitor.runMirrorLab() }
                     .disabled(monitor.running)
                 Text(monitor.labStatus).font(.caption)
                 ForEach(monitor.scenarios, id: \.name) { item in

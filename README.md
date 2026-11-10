@@ -2,7 +2,9 @@
 
 Research towards cloud-backed swap for existing macOS applications, with a native menu-bar app and a portable Rust core.
 
-**Current build does not redirect macOS swap or free disk space.** It provides a compiled Mac monitor, a Rust failure-policy simulator, a native encrypted R2 probe, and the preserved Linux/Python experiment. Real R2 access, Linux kernel paging and Mac kernel paging are distinct, currently unverified gates.
+**Current build does not redirect macOS swap or demonstrate reclaimed disk space.** It provides a native Mac menu-bar app, encrypted local/external storage, an R2 pager and optional full local mirror. Actual Linux kernel paging and controlled disconnects are verified against a loopback HTTP object service. Live R2, physical drive/Wi-Fi tests and native Mac swap attachment remain unverified.
+
+**Continuing in Codex? Start with [CODEX-HANDOVER.md](docs/CODEX-HANDOVER.md) and [CHAT-CONTEXT.md](docs/CHAT-CONTEXT.md).** The implementation and these records are on `feat/macos-foundation`, in [PR #1](https://github.com/EmotiveImpact/CLOUDSWAP/pull/1). Do not assume `main` contains them.
 
 ## Build on a Mac
 
@@ -14,24 +16,26 @@ bash scripts/build-mac.sh
 open dist/CLOUDSWAP.app
 ```
 
-The menu shows swap usage, available disk space and network-path availability. Its simulation button launches the bundled Rust helper. Network availability does not mean R2 is reachable. The app is ad-hoc signed for local development, not notarised for distribution.
+The menu shows swap usage, available disk space and network-path availability. Its simulation button launches the bundled Rust helper. **Test external drive folder…** writes and verifies 1 MiB of encrypted synthetic pages in a selected folder. Interactive acceptance and physical unplug/replug remain pending. Network availability does not mean R2 is reachable. The app is ad-hoc signed for local development, not notarised for distribution.
 
 ## Native R2 experiment
 
 ```sh
 .build-cache/package/release/R2Lab --self-test
 .build-cache/package/release/R2Lab --live
+.build-cache/package/release/R2Lab --pager-live
 ```
 
 Live mode requires `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` supplied securely in the process environment. Do not commit secrets or paste them into an issue. Use a dedicated private test bucket and bucket-scoped object read/write credentials. The probe uploads 16 KiB of encrypted synthetic data, reads and authenticates it, then deletes only that unique test object. Cleanup failure reports the object key for later removal. It does not upload app memory or files.
 
-The Swift R2 probe is not yet connected to the Rust pager. Its SigV4 implementation is compiled but awaits live interoperability verification. This small bounded experiment is not a production R2 SDK.
+The Swift R2 client is connected to the native RemotePager. The Rust component remains a separate policy simulator. Its SigV4 implementation is compiled but awaits live interoperability verification. This small bounded experiment is not a production R2 SDK.
 
 ## Layout
 
 - `apps/macos`: SwiftUI menu-bar app and native CryptoKit/URLSession R2 probe.
 - `crates/cloudswap-core`: Rust acknowledgement and failure policy; simulated transport only.
-- `labs/linux-python`: original AES-GCM/R2 storage prototype and nbdkit adapter. Unit-tested on Mac; not yet attached to Linux swap.
+- `labs/linux-python`: original AES-GCM/R2 storage prototype and nbdkit adapter.
+- `labs/linux-vm`: verified Linux kernel paging and controlled HTTP disconnect lab using QEMU and nbdkit.
 - `research`: pinned upstream source archives, provenance manifests and porting analysis.
 - `docs`: architecture, evidence and next verification gates.
 

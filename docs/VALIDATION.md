@@ -1,5 +1,13 @@
 # Validation record: 10 November 2026
 
+## Latest implementation checkpoint
+
+At `dc57860314fb3a16468fd23258770610f6e111ad`, all 29 native tests, local release packaging, signature verification and bundled self-tests passed. [Foundation CI](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42819009576) and [Linux kernel paging CI](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42819009535) passed on this commit. External-folder UI and optional mirrored remote storage are implemented; physical drive tests, live R2 and Mac kernel integration remain pending. See [external storage](EXTERNAL-STORAGE.md) and [Codex handover](CODEX-HANDOVER.md).
+
+The sections below record earlier development stages chronologically. Statements about an unconnected UI, missing volume-identity checks or remote-only storage describe those earlier stages and are superseded by the checkpoint above.
+
+## Foundation checks
+
 | Check | Result |
 |---|---|
 | Rust unit tests | 6 passed, including five outage-policy scenarios within one test |

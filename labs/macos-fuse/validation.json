@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-10",
+  "branch": "feat/fuse-file-adapter",
+  "base_commit": "023999efa21859baf36209147d241a9bffd51528",
+  "host": {
+    "os": "macOS",
+    "version": "14.5",
+    "architecture": "arm64"
+  },
+  "native_xctest": {
+    "passed": 40,
+    "failed": 0
+  },
+  "python_tests_with_packaged_release_helper": {
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0
+  },
+  "release_build": true,
+  "ad_hoc_signature_deep_strict_verified": true,
+  "packaged_crypto_self_test": true,
+  "callback_acceptance": {
+    "backend": "native_local_encrypted",
+    "bytes_verified": 4194304,
+    "helper_process_restart": true,
+    "live_r2": false,
+    "macos_system_swap": false,
+    "mounted": false,
+    "passed": true,
+    "range_writes": 36,
+    "test": "fuse_callbacks_without_mount"
+  },
+  "fault_evidence": [
+    "native helper killed after acknowledged writes; fresh process recovers",
+    "wrong or malformed key rejected",
+    "missing and corrupted committed data fail",
+    "renamed and replaced directory rejects writes and requires reopen",
+    "simulated IPC stall, crash, oversized frame, wrong response ID and malformed payload stop client",
+    "simulated remote outage read recovery and offline mirror reads; offline writes stop session",
+    "partial multi-page write failure stops session; earlier pages can be committed"
+  ],
+  "not_verified": [
+    "FUSE library ABI and actual mount",
+    "live R2",
+    "physical SSD disconnect",
+    "physical Wi-Fi disconnect",
+    "mmap",
+    "native macOS system swap",
+    "disk-space savings",
+    "power-loss durability",
+    "multiple Mac models"
+  ],
+  "source_sha256": {
+    "apps/macos/Sources/PagingStore/PagingStore.swift": "1f1571a804ed14311e466a965c1af31fdb653cbbe6f311eaedcdeeb7c77ec778",
+    "apps/macos/Sources/PagingStore/RemotePager.swift": "efa9b46e8c6db7aff0f0f2cf9d77185391bcecc2d64439141a23980c520525c6",
+    "apps/macos/Sources/PagingStore/VirtualPageFile.swift": "4467866df2328b96b1814a19b3e0241f595122ac7114419440184ae126bd4418",
+    "apps/macos/Sources/R2Lab/R2Lab.swift": "e1eec3f7488a533d4b5d32148c2423e08251823b74002cb0c99f12245bad5a84",
+    "apps/macos/Sources/R2Lab/FileServer.swift": "6a735bb72b95fad694152bf285e5efa8b9e3b6670a0f24954bbdec402a6dc9fb",
+    "apps/macos/Tests/PagingStoreTests/VirtualPageFileTests.swift": "df544bbaaac506f311bee2a5b4fbee0291672e8f3cea216d7f5e41aebf995faf",
+    "labs/macos-fuse/cloudswap_fuse.py": "f0be9bfde581871fd216b5eed1c1263765e220508f8b89693ed225c2456eea43",
+    "labs/macos-fuse/test_cloudswap_fuse.py": "c7f62e605641b94e6ecf4dd3f504889c866b7dd569d486ba669f5e007aae6675"
+  },
+  "ci_matrix_configured": [
+    "macos-latest",
+    "macos-15-intel"
+  ]
+}

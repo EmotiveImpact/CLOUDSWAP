@@ -1,0 +1,58 @@
+name: Mounted Mac storage lab
+on:
+  pull_request:
+    paths:
+      - 'apps/macos/**'
+      - 'labs/macos-nfs/**'
+      - '.github/workflows/mac-mounted-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mounted-lab-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mounted:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build native helper
+        run: swift build --package-path apps/macos --configuration release --product R2Lab
+      - name: Build and test Rust NFS bridge
+        run: |
+          python3 labs/macos-nfs/verify-source.py
+          cargo test --locked --manifest-path labs/macos-nfs/Cargo.toml
+          cargo build --locked --release --manifest-path labs/macos-nfs/Cargo.toml
+      - name: Read kernel capabilities as runner user and root
+        run: |
+          mkdir -p lab-results
+          python3 scripts/mac-capabilities.py > lab-results/capabilities-user.json
+          sudo -n python3 scripts/mac-capabilities.py > lab-results/capabilities-root.json
+          cat lab-results/capabilities-root.json
+          sudo -n env GITHUB_ACTIONS=true RUNNER_ENVIRONMENT=github-hosted GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
+            python3 labs/macos-nfs/ci-prefix-probe.py --ci > lab-results/prefix-write-probe.json
+          cat lab-results/prefix-write-probe.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capabilities-${{ matrix.runner }}
+          path: |
+            lab-results/capabilities-*.json
+            lab-results/prefix-write-probe.json
+      - name: Actual mount, fsync, unmount and fresh-process reopen
+        run: |
+          python3 labs/macos-nfs/lab.py --ci --mount \
+            --server labs/macos-nfs/target/release/cloudswap-nfs-lab \
+            --helper apps/macos/.build/release/R2Lab \
+            --report lab-results/mounted.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mounted-lab-${{ matrix.runner }}
+          path: lab-results/

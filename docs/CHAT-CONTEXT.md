@@ -55,3 +55,32 @@ The user explicitly requested that the project information from this chat be sav
 
 ## Working preferences
 Use British English. Communicate plainly and concisely. Avoid unnecessary em dashes and en dashes. Keep building and testing the authorised work; don't repeatedly ask whether to continue. Do not claim background work continues after a turn unless an actual running system supports it.
+
+## FUSE implementation follow-through
+
+The user supplied https://github.com/topics/fuse and asked to keep building.
+Research led to a native encrypted file adapter with an optional FUSE frontend,
+without replacing the native Mac swap objective with ordinary file offloading.
+The current development Mac lacks a FUSE runtime. Direct callback tests and real
+helper-process restart/failure tests are therefore recorded separately from a
+mounted filesystem and from kernel paging. The adapter is deliberately fixed at
+4 MiB while its failure semantics are tested. See `labs/macos-fuse/README.md`.
+
+## Integration follow-through
+
+The user again instructed us to complete the authorised work without stopping.
+PR #8 combines all six pending feature/research branches. A Rust bridge through
+macOS's built-in NFS client was added to obtain a real mount proof without
+installing a third-party filesystem runtime on the working Mac. FUSE-T's binary
+licence was inspected before adoption and contains commercial-use restrictions.
+No binary was installed. This is still aimed at proving the storage path before
+the separate, unresolved native Mac kernel swap gate.
+
+The integrated NFS storage path subsequently passed real mounted read/write,
+flush, process restart, remount and one-second server-pause recovery tests on
+Intel and Apple Silicon hosted Macs. Root prefix writes were then tested using
+the unchanged stock value on Intel. PR #9 builds on that with a disposable APFS
+virtual-volume experiment: actual kernel page-out/page-in traces were captured,
+and all 8.0625 GiB of the synthetic workload verified. This is not yet physical
+external-SSD certification, cloud-backed system swap or a product activation
+feature. The working Mac's swap configuration remains unchanged.

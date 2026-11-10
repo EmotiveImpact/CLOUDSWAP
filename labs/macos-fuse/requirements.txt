@@ -1,0 +1,2 @@
+# Optional mount binding only. Runtime/driver is a separate host prerequisite.
+fusepy==3.0.1 --hash=sha256:72ff783ec2f43de3ab394e3f7457605bf04c8cf288a2f4068b4cde141d4ee6bd

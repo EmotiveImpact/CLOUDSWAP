@@ -1,0 +1,97 @@
+{
+  "repository": "https://github.com/huggingface/nfsserve",
+  "commit": "327b45530f04664da678297ce2568c47bf3fbf81",
+  "version": "0.11.0",
+  "licence": "BSD-3-Clause",
+  "changes": [
+    "RPC record maximum 128 KiB and read deadline",
+    "XDR byte/string and integer vector allocation bounds",
+    "Eight accepted connections and serial RPC processing per connection",
+    "Two-entry reply queue",
+    "NFS WRITE count validation",
+    "NFS COMMIT invokes a backend checkpoint",
+    "Independent bounded TCP receive, processing and reply flows prevent pipelined-write deadlock"
+  ],
+  "files": {
+    "Cargo.toml": {
+      "original_sha256": "e1418c62de37a6c89e0dc5c4a6c14b2bae9d6c29870f1f639985a2388f3c99c2",
+      "vendored_sha256": "e1418c62de37a6c89e0dc5c4a6c14b2bae9d6c29870f1f639985a2388f3c99c2"
+    },
+    "LICENSE": {
+      "original_sha256": "f8254b0c6339281c9b458fae067d68b3a36048f279f022acaa45f918d836c1ea",
+      "vendored_sha256": "f8254b0c6339281c9b458fae067d68b3a36048f279f022acaa45f918d836c1ea"
+    },
+    "README.md": {
+      "original_sha256": "3c08cc29176d85d0b6a7812a6999831b30bc1879057a6851b531bb90b801972d",
+      "vendored_sha256": "3c08cc29176d85d0b6a7812a6999831b30bc1879057a6851b531bb90b801972d"
+    },
+    "src/config.rs": {
+      "original_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "vendored_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "src/context.rs": {
+      "original_sha256": "9a86a898733344bb7832fd6154e9764700edef9097c00c2f45d927f729ce1f3e",
+      "vendored_sha256": "9a86a898733344bb7832fd6154e9764700edef9097c00c2f45d927f729ce1f3e"
+    },
+    "src/fs_util.rs": {
+      "original_sha256": "16530d2eadaa92b7e7bd9591b5605c5637eebe49111e7ec5230b2195901477af",
+      "vendored_sha256": "16530d2eadaa92b7e7bd9591b5605c5637eebe49111e7ec5230b2195901477af"
+    },
+    "src/lib.rs": {
+      "original_sha256": "0e8e7a0a91aa56541f7171fd2580a50206cab9d28fa9383936dd89f00b577acb",
+      "vendored_sha256": "0e8e7a0a91aa56541f7171fd2580a50206cab9d28fa9383936dd89f00b577acb"
+    },
+    "src/mount.rs": {
+      "original_sha256": "5061de2cb2aedebe2bb23589871bef3e5ad452e4f2ca9de44ac94126bab22bce",
+      "vendored_sha256": "5061de2cb2aedebe2bb23589871bef3e5ad452e4f2ca9de44ac94126bab22bce"
+    },
+    "src/mount_handlers.rs": {
+      "original_sha256": "790507bfdfb280303f55bebceb0fd73b5a2c0f29ad2750596f767c2b81be3c79",
+      "vendored_sha256": "790507bfdfb280303f55bebceb0fd73b5a2c0f29ad2750596f767c2b81be3c79"
+    },
+    "src/nfs.rs": {
+      "original_sha256": "eeb9fddfaa71ed136482391af2abd706b8ee99c8f94d09ef14639b94906f308f",
+      "vendored_sha256": "eeb9fddfaa71ed136482391af2abd706b8ee99c8f94d09ef14639b94906f308f"
+    },
+    "src/nfs_handlers.rs": {
+      "original_sha256": "826c832c029d29a946ed73d07a5358e4fb3e9bf73fd81fdee3d31e67624eb510",
+      "vendored_sha256": "2c60d6414a98de148374acade235e1c6147e0ac44353ae18abae7439e8c60206"
+    },
+    "src/portmap.rs": {
+      "original_sha256": "9b18b95bed75f37c2836e9b40ffff2368afac23acf410c3370bf7b96a5e62828",
+      "vendored_sha256": "9b18b95bed75f37c2836e9b40ffff2368afac23acf410c3370bf7b96a5e62828"
+    },
+    "src/portmap_handlers.rs": {
+      "original_sha256": "bb2297342eba6595d77954d0b296eec3bad31068c26e3646d432cc8b33316c4d",
+      "vendored_sha256": "bb2297342eba6595d77954d0b296eec3bad31068c26e3646d432cc8b33316c4d"
+    },
+    "src/rpc.rs": {
+      "original_sha256": "7dc67c913a44402ba374bf834a42234f8cf88f6eebd18cf1eae52d4b173dedd6",
+      "vendored_sha256": "7dc67c913a44402ba374bf834a42234f8cf88f6eebd18cf1eae52d4b173dedd6"
+    },
+    "src/rpcwire.rs": {
+      "original_sha256": "d8b4df58950c602b832ee3c07f3c4de478407ae0c6ddbda7fdc67358010ff012",
+      "vendored_sha256": "d1021b291520fec119f0fa74a1f042b2308056bb5003995162793a3c947e0923"
+    },
+    "src/tcp.rs": {
+      "original_sha256": "1206c94a35e11d701a29f4f47d997af3ee5587174fefdbe786589ab7a5f95856",
+      "vendored_sha256": "a23dbc4fdd72a27dcc888df8ff7cb62f51c74134e6551b5024c706452ade81a3"
+    },
+    "src/transaction_tracker.rs": {
+      "original_sha256": "91ed917eeb351a38471414dfa69cc611d45c8b41643e2db13396e9944f0f1a21",
+      "vendored_sha256": "91ed917eeb351a38471414dfa69cc611d45c8b41643e2db13396e9944f0f1a21"
+    },
+    "src/vfs.rs": {
+      "original_sha256": "e4f76595e0e3193612fe124094971f696d92547b8e79eb891e11849ebf0e9578",
+      "vendored_sha256": "3c0530e44cac67d7f6823bc4bf7523907accda1187946fa4af996d6228bebc5d"
+    },
+    "src/write_counter.rs": {
+      "original_sha256": "a530d38d13ad29f07544eaafe92116736ca69daafacdfbe5c44f128051d1f5e5",
+      "vendored_sha256": "a530d38d13ad29f07544eaafe92116736ca69daafacdfbe5c44f128051d1f5e5"
+    },
+    "src/xdr.rs": {
+      "original_sha256": "29b9cbaf586c8af29651b7d11affb0b31d087bf3bfe75c6080768c8810f749ab",
+      "vendored_sha256": "8a2f60a384e8641dd6a3d8ffa73436c5ac1806016015f75529406ae9af91b723"
+    }
+  }
+}

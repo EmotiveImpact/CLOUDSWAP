@@ -1,5 +1,11 @@
 name: Verify foundation
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+concurrency:
+  group: foundation-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -16,10 +22,28 @@ jobs:
           tar -xzf research/Infiniswap-source.tar.gz -C research/upstream
           python3 scripts/verify-sources.py
   mac-build:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-latest, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Record Mac toolchain and architecture
+        run: |
+          sw_vers
+          uname -m
+          swift --version
+          python3 --version
       - run: swift test --package-path apps/macos
       - run: bash scripts/build-mac.sh
       - run: dist/CLOUDSWAP.app/Contents/Helpers/cloudswap-lab
       - run: dist/CLOUDSWAP.app/Contents/Helpers/R2Lab --self-test
+      - run: dist/CLOUDSWAP.app/Contents/Helpers/R2Lab --tiered-self-test
+
+      - name: FUSE callbacks and native helper faults (no mount)
+        run: |
+          export CLOUDSWAP_FILE_HELPER="$PWD/dist/CLOUDSWAP.app/Contents/Helpers/R2Lab"
+          python3 -m unittest discover -s labs/macos-fuse -v
+          python3 labs/macos-fuse/cloudswap_fuse.py --self-test --helper "$CLOUDSWAP_FILE_HELPER"

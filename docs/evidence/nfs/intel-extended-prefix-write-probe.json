@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "scope": "unchanged_stock_prefix_write_probe",
+  "prefix_before": "/System/Volumes/VM/swapfile",
+  "write_attempted": true,
+  "placement_tested": false,
+  "memory_pressure_applied": false,
+  "exit_code": 0,
+  "prefix_after": "/System/Volumes/VM/swapfile",
+  "diagnostic": "",
+  "state": "unchanged_write_accepted",
+  "evidence_source": {
+    "run_id": 42844108611,
+    "job_id": 129926827079,
+    "artifact_id": 13777068446,
+    "revision": "97d4fe13303bd9a5a67b4c19b53812fbb3d34f92",
+    "hosted_runner": true
+  }
+}

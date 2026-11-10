@@ -46,6 +46,21 @@ final class PagingStoreTests: XCTestCase {
         try FileManager.default.removeItem(at: root.appendingPathComponent("index.enc"))
         XCTAssertThrowsError(try create())
     }
+    func testCheckpointRejectsMissingIndexAndStopsSession() throws {
+        let store = try create(); try store.write(block: 0, data: data)
+        try FileManager.default.removeItem(at: root.appendingPathComponent("index.enc"))
+        XCTAssertThrowsError(try store.checkpoint())
+        XCTAssertThrowsError(try store.write(block: 1, data: data))
+    }
+    func testCheckpointRejectsAuthenticatedIndexRollback() throws {
+        let store = try create(); try store.write(block: 0, data: data)
+        let manifest = root.appendingPathComponent("index.enc")
+        let old = try Data(contentsOf: manifest)
+        try store.write(block: 1, data: data)
+        try old.write(to: manifest)
+        XCTAssertThrowsError(try store.checkpoint())
+        XCTAssertThrowsError(try store.read(block: 0))
+    }
     func testBoundsAndMissing() throws {
         let store = try create()
         XCTAssertThrowsError(try store.read(block: 0))

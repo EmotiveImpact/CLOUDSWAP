@@ -53,3 +53,48 @@ This strengthens the candidate beyond an isolated sysctl declaration: Apple has 
 The same source deliberately exits successfully even on certain failures. It also unlinks directory entries whose names start with swap. Therefore a zero exit status cannot establish that placement worked, and invoking it against an ordinary directory could delete unrelated files with matching names. It is intended for boot-time use; do not casually restart it or use it as a live migration tool.
 
 Read-only inspection of /sbin/dynamic_pager on the observed 14.5 host found the swapfileprefix and error-message strings. Its SHA-256 was 9bf7cbf5ac838a6e6a3cae4bb50881df3f84b46ab0851ccde0e0e8c14bc82817. The executable was not run, decompiled or proved identical to the pinned source. No privileged write was attempted.
+
+## Apple NFS client source and mapped-file gate
+
+Apple publishes its NFS client separately from the reviewed XNU snapshots in
+[apple-oss-distributions/NFS](https://github.com/apple-oss-distributions/NFS).
+The complete checkout is pinned at `93733ffccece4daee73bf6306b291d1ae69130c0`
+(tag `NFS-343.100.5`) under `research/kernel-sources/apple-nfs`, with provenance
+in `sources.json`. It has not been binary-matched to a test Mac.
+
+`kext/nfs_vnops.c` registers `nfs_vnop_pagein` and `nfs_vnop_pageout` and contains
+their implementations at lines 8263 and 8648. `kext/nfs_vfsops.c` calls
+`vflush(..., SKIPSWAP | flags)` during unmount at line 4592. These are useful
+source leads, not proof that a shipping kernel will select an NFS file as swap.
+No `vfs_setnoswap` call was found in this pinned client source; absence alone
+does not establish swap eligibility or policy access.
+
+The Rust NFS lab now tests dirtying a file-backed mmap, msync/fsync, a cold
+remount and mapped reads. This exercises a narrower contract than redirecting
+an existing application's anonymous-memory swap. Our fixed 4 MiB file cannot
+yet satisfy XNU's create/truncate/resize swap-file lifecycle. A user-space
+gateway also requires a separately proven memory-reservation strategy to avoid
+depending on its own remote pages under pressure.
+
+Read-only codesign inspection of the working Mac's `/sbin/dynamic_pager` found
+`com.apple.rootless.volume.VM` in its entitlements. It was not run. This does not
+prove that the entitlement controls `vm.swapfileprefix`; root capability results
+and an isolated placement experiment remain necessary.
+
+## Runtime follow-through, hosted Intel macOS 15.7.9
+
+[PR #9](https://github.com/EmotiveImpact/CLOUDSWAP/pull/9) and
+[run 42845793503](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42845793503)
+advance the earlier hypotheses. A disposable hosted Intel Mac accepted a prefix
+on a new APFS disk-image volume, created its swapfile0 there, and produced
+PgOut/PgIn trace events naming that file and device. Global counters advanced by
+896 swap-out pages and 832 swap-in pages (4 KiB pages), and the bounded workload
+verified all 8.0625 GiB. Its original prefix was restored, with the possible
+live swap volume left mounted until runner teardown.
+
+This is native kernel paging evidence for that virtual-volume configuration. It
+does not establish physical external-drive reliability, cloud filesystem swap,
+per-allocation page attribution, existing-page migration or net space savings.
+The earlier access-denied working-Mac observation remains specific to that
+restricted execution environment and did not establish that the control was
+unavailable on ordinary/root Mac sessions.

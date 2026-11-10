@@ -1,0 +1,777 @@
+{
+  "acquired": "2026-11-10",
+  "repositories": [
+    {
+      "repository": "SymbioticLab/Infiniswap",
+      "url": "https://github.com/SymbioticLab/Infiniswap.git",
+      "commit": "da7c14bf749ccadb4ef44953579d55143e8e7182",
+      "tree": "fb9268be83234030d8e483d940bf49e2d5d46a1f",
+      "path": "research/disaggregation/sources/SymbioticLab--Infiniswap",
+      "root_documents": [
+        {
+          "path": "README.md",
+          "blob": "4cf5af6d77bac6089603672874fbf913e88cd0d5",
+          "size": 11171
+        }
+      ],
+      "licence_status": "no_root_licence_identified_review_required",
+      "root_entries": [
+        "README.md",
+        "infiniswap_bd",
+        "infiniswap_daemon",
+        "setup"
+      ]
+    },
+    {
+      "repository": "thustorage/Sherman",
+      "url": "https://github.com/thustorage/Sherman.git",
+      "commit": "9bca43141f487f7a1b0492b88f106476eb3dbbf6",
+      "tree": "070f2baaef1ecc6a3b542e008a001e7e72a88b8d",
+      "path": "research/disaggregation/sources/thustorage--Sherman",
+      "root_documents": [
+        {
+          "path": "README.md",
+          "blob": "a0e3890be2d31699d5b37547fb94e82782dd93b3",
+          "size": 3234
+        }
+      ],
+      "licence_status": "no_root_licence_identified_review_required",
+      "root_entries": [
+        ".github",
+        ".gitignore",
+        "CMakeLists.txt",
+        "README.md",
+        "include",
+        "memcached.conf",
+        "run.sh",
+        "script",
+        "src",
+        "test"
+      ]
+    },
+    {
+      "repository": "purduedb/OpenAurora",
+      "url": "https://github.com/purduedb/OpenAurora.git",
+      "commit": "c16fc0f45b245e6e94ae80d9b4843476f00e6b25",
+      "tree": "c8c0ee000f5d4d1044788617845cf7463ea4be72",
+      "path": "research/disaggregation/sources/purduedb--OpenAurora",
+      "root_documents": [
+        {
+          "path": "README",
+          "blob": "6416a8cf3b4677c4828f775c402bf18631f35b00",
+          "size": 1213
+        },
+        {
+          "path": "README.git",
+          "blob": "4bf614eea4a2ee32400a1e8154d0bbde676c0e46",
+          "size": 721
+        },
+        {
+          "path": "README.md",
+          "blob": "8ea4d47b58924eeccb11d7c0170ad53d0761aa4a",
+          "size": 10598
+        }
+      ],
+      "licence_status": "no_root_licence_identified_review_required",
+      "root_entries": [
+        ".dir-locals.el",
+        ".editorconfig",
+        ".git-blame-ignore-revs",
+        ".gitattributes",
+        ".gitignore",
+        "COPYRIGHT",
+        "GNUmakefile.in",
+        "HISTORY",
+        "Makefile",
+        "README",
+        "README.git",
+        "README.md",
+        "aclocal.m4",
+        "config",
+        "configure",
+        "configure.ac",
+        "contrib",
+        "doc",
+        "pictures",
+        "src"
+      ]
+    },
+    {
+      "repository": "Amit-P89/-DRackSim",
+      "url": "https://github.com/Amit-P89/-DRackSim.git",
+      "commit": "7af5c2d6d570317aa8b00ab249597e05870618ad",
+      "tree": "71b7e485f0cd6002e60f70ff8024e36c4936b100",
+      "path": "research/disaggregation/sources/Amit-P89---DRackSim",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+          "size": 35149
+        },
+        {
+          "path": "readme.md",
+          "blob": "6aab17362529c1bc80d8ef66fbf7f8ea3ce9412a",
+          "size": 1952
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".github",
+        "DRACKSim-Detailed",
+        "DRackSim-Trace",
+        "LICENSE",
+        "gem5_patch_commands",
+        "readme.md"
+      ]
+    },
+    {
+      "repository": "uclasystem/MemLiner",
+      "url": "https://github.com/uclasystem/MemLiner.git",
+      "commit": "ea5a243cb5f021de26a41731f15ed63901faf837",
+      "tree": "56bbface8adfbd2bc727d37bf33a0c871a05cf4f",
+      "path": "research/disaggregation/sources/uclasystem--MemLiner",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+          "size": 35149
+        },
+        {
+          "path": "README.md",
+          "blob": "74d2e9d6c119dc5a83828d531ce4eac876692a44",
+          "size": 11380
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        "JDK",
+        "Kernel",
+        "LICENSE",
+        "README.md",
+        "app-scripts",
+        "config-files",
+        "scripts"
+      ]
+    },
+    {
+      "repository": "uclasystem/Mako",
+      "url": "https://github.com/uclasystem/Mako.git",
+      "commit": "b5afd9e33a13f5096a9f4b39034afe1d1fa54c67",
+      "tree": "18dba60a965883a836aef7d355562ebe414be0d0",
+      "path": "research/disaggregation/sources/uclasystem--Mako",
+      "root_documents": [
+        {
+          "path": "README.md",
+          "blob": "9d90359c44607191844d9d63ecebb5be83f1046c",
+          "size": 6019
+        }
+      ],
+      "licence_status": "no_root_licence_identified_review_required",
+      "root_entries": [
+        ".gitignore",
+        "Mako-CPU",
+        "Mako-Memory",
+        "README.md",
+        "kernel"
+      ]
+    },
+    {
+      "repository": "eniac/TELEPORT",
+      "url": "https://github.com/eniac/TELEPORT.git",
+      "commit": "ff62861537a147fdfee5c2bf617bad7042149338",
+      "tree": "fba73c7930236f591d268e0c57e9e07c02c0a83d",
+      "path": "research/disaggregation/sources/eniac--TELEPORT",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "d7f105139782ab695d86613e343916f7372f4ac0",
+          "size": 18026
+        },
+        {
+          "path": "README.md",
+          "blob": "e66bcfc2df2f26f54659e3c01258f180d4a5d1a2",
+          "size": 3319
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        "Documentation",
+        "Kbuild",
+        "Kconfig",
+        "LICENSE",
+        "LegoOS_README.md",
+        "Makefile",
+        "README.md",
+        "arch",
+        "conf",
+        "drivers",
+        "include",
+        "init",
+        "kernel",
+        "lib",
+        "linux-modules",
+        "managers",
+        "mm",
+        "net",
+        "scripts",
+        "teleport",
+        "usr"
+      ]
+    },
+    {
+      "repository": "Coekjan/CrossPool",
+      "url": "https://github.com/Coekjan/CrossPool.git",
+      "commit": "1e4b15f67cc01e1f363312a186f37568276f1fde",
+      "tree": "a9744e9e29a5450a6e4b92f5717b37cd6b49ab0d",
+      "path": "research/disaggregation/sources/Coekjan--CrossPool",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "f1f9eda8e5f9089696622e42aa0b1a56b05e3647",
+          "size": 1068
+        },
+        {
+          "path": "README.md",
+          "blob": "30b74463e34a1d5008f75a214d219911102fcfad",
+          "size": 8336
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".clang-format",
+        ".clang-format-ignore",
+        ".codex",
+        ".env.example",
+        ".github",
+        ".gitignore",
+        ".pre-commit-config.yaml",
+        ".python-version",
+        "AGENTS.md",
+        "CMakeLists.txt",
+        "CONTEXT.md",
+        "Doxyfile",
+        "LICENSE",
+        "README.md",
+        "THIRD_PARTY_NOTICES.md",
+        "benches",
+        "cmake",
+        "configs",
+        "docs",
+        "pyproject.toml",
+        "src",
+        "tests",
+        "uv.lock"
+      ]
+    },
+    {
+      "repository": "DatabaseGroup/rdma-inverted-index",
+      "url": "https://github.com/DatabaseGroup/rdma-inverted-index.git",
+      "commit": "1a6635ef353877ac6dac527e1e691e8b27e31b2a",
+      "tree": "1507858221b5340ecfc7d251db551bea3c4d0a67",
+      "path": "research/disaggregation/sources/DatabaseGroup--rdma-inverted-index",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "efa3ee790ea2e40fb0e0b37e5845b458f941f993",
+          "size": 1089
+        },
+        {
+          "path": "README.md",
+          "blob": "bf924b6ddaf109165d82967e6a67bb70bf390dd6",
+          "size": 19159
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".clang-format",
+        ".gitignore",
+        "CMakeLists.txt",
+        "LICENSE",
+        "README.md",
+        "example",
+        "rdma-library",
+        "scripts",
+        "src"
+      ]
+    },
+    {
+      "repository": "fukien/hashjoins-meet-cxl",
+      "url": "https://github.com/fukien/hashjoins-meet-cxl.git",
+      "commit": "0aeea0db2103d8706a6929f8d0e037bffd4e3623",
+      "tree": "dc11703aa1ee8c4b6602642303a0583d454d4c5b",
+      "path": "research/disaggregation/sources/fukien--hashjoins-meet-cxl",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "40b0b4e28768a792f089db9766a6158ec14d0f27",
+          "size": 1069
+        },
+        {
+          "path": "README.md",
+          "blob": "fdbee0891bd41a99c8d8f9e99305513a0b895a91",
+          "size": 1381
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        "CMakeLists.txt",
+        "LICENSE",
+        "README.md",
+        "build.sh",
+        "clean.sh",
+        "scripts",
+        "src"
+      ]
+    },
+    {
+      "repository": "engrtarun/T9-VirtualRAM",
+      "url": "https://github.com/engrtarun/T9-VirtualRAM.git",
+      "commit": "868958a5d5ef411e502a070e9da45dac5df79be1",
+      "tree": "89443e008dcf02b0ced91727840e2338399b037b",
+      "path": "research/disaggregation/sources/engrtarun--T9-VirtualRAM",
+      "root_documents": [
+        {
+          "path": "README.md",
+          "blob": "0333ba011ca6a429027b8b764ee5d09aa8d42faf",
+          "size": 4183
+        }
+      ],
+      "licence_status": "no_root_licence_identified_review_required",
+      "root_entries": [
+        ".gitignore",
+        ".gitmodules",
+        "README.md",
+        "resarch __ T9 VirtualRAM.pdf",
+        "submodules"
+      ]
+    },
+    {
+      "repository": "SymbioticLab/Leap",
+      "url": "https://github.com/SymbioticLab/Leap.git",
+      "commit": "13787f2bb5e4cf830e7ff05c189a81c295645022",
+      "tree": "ec1a25ec994e11878a0a9c0d8da14142125ce3aa",
+      "path": "research/disaggregation/sources/SymbioticLab--Leap",
+      "root_documents": [
+        {
+          "path": "COPYING",
+          "blob": "ca442d313d86dc67e0a2e5d584b465bd382cbf5c",
+          "size": 18693
+        },
+        {
+          "path": "README",
+          "blob": "f4756ee1c918eada0f011f198c10cd8b9942e184",
+          "size": 18599
+        },
+        {
+          "path": "README.md",
+          "blob": "22a23b99ec00d9288514f773f7926c2c647df106",
+          "size": 5249
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        "COPYING",
+        "CREDITS",
+        "Documentation",
+        "Kbuild",
+        "Kconfig",
+        "MAINTAINERS",
+        "Makefile",
+        "README",
+        "README.md",
+        "REPORTING-BUGS",
+        "arch",
+        "block",
+        "certs",
+        "crypto",
+        "daemon",
+        "drivers",
+        "example",
+        "firmware",
+        "fs",
+        "include",
+        "init",
+        "ipc",
+        "kernel",
+        "leap",
+        "lib",
+        "mm",
+        "net",
+        "samples",
+        "scripts",
+        "security",
+        "sound",
+        "tools",
+        "usr",
+        "virt"
+      ]
+    },
+    {
+      "repository": "clusterfarmem/fastswap",
+      "url": "https://github.com/clusterfarmem/fastswap.git",
+      "commit": "9cfc2adfc1653a0a93139da535e6364277566898",
+      "tree": "473bb0f081fc69015e225f738b23a54c31ee652d",
+      "path": "research/disaggregation/sources/clusterfarmem--fastswap",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "19e307187ac8b9abc086be686dc81b0f09523ef1",
+          "size": 26461
+        },
+        {
+          "path": "README.md",
+          "blob": "11371a98f2d1830c7e8f27547604d7a9e99ad5a2",
+          "size": 4424
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        "LICENSE",
+        "README.md",
+        "drivers",
+        "farmemserver",
+        "kernel"
+      ]
+    },
+    {
+      "repository": "uclasystem/canvas",
+      "url": "https://github.com/uclasystem/canvas.git",
+      "commit": "4c51f0b9aa9081ae3ffefac7ad57d1bf1217094c",
+      "tree": "4f27aca095a4100eefcbcc5b0f5b5e0e48678525",
+      "path": "research/disaggregation/sources/uclasystem--canvas",
+      "root_documents": [
+        {
+          "path": "README.md",
+          "blob": "1e0c2631b902c258ba08c405587dfe196e7f612a",
+          "size": 9784
+        }
+      ],
+      "licence_status": "no_root_licence_identified_review_required",
+      "root_entries": [
+        "README.md",
+        "linux-5.5",
+        "remoteswap"
+      ]
+    },
+    {
+      "repository": "AIFM-sys/AIFM",
+      "url": "https://github.com/AIFM-sys/AIFM.git",
+      "commit": "fa4f31ce827501ad52f5a5ca9249ef04ba92b467",
+      "tree": "4430a6509443b653ee87e2b563f6ba6b5cd61ea3",
+      "path": "research/disaggregation/sources/AIFM-sys--AIFM",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "1f999a3b50c2324a1caf4462b40c8080106d3e5e",
+          "size": 1066
+        },
+        {
+          "path": "README.md",
+          "blob": "88131a6c606c240ca6bd9e8bc53526a34c329ac8",
+          "size": 7329
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        ".gitmodules",
+        "LICENSE",
+        "README.md",
+        "aifm",
+        "build_all.sh",
+        "cloudlab.profile",
+        "shenango"
+      ]
+    },
+    {
+      "repository": "compiler-disagg/TrackFM",
+      "url": "https://github.com/compiler-disagg/TrackFM.git",
+      "commit": "e4f8041231c6e6fe74c2b4b5c50f9787bc8e5b0d",
+      "tree": "20e8824240af5db8d7bd835ebf92fb5229acda14",
+      "path": "research/disaggregation/sources/compiler-disagg--TrackFM",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "b187527714440d69d514be9893f8e36d4a22aeb0",
+          "size": 1090
+        },
+        {
+          "path": "README.md",
+          "blob": "21f5a25c497f3724318ea655a87e9f112251f572",
+          "size": 14961
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        ".gitmodules",
+        "AIFM",
+        "CITATION.cff",
+        "LICENSE",
+        "Makefile",
+        "README.md",
+        "app_symbols",
+        "apps",
+        "cloudlab.profile",
+        "exp",
+        "fastswap",
+        "figs",
+        "install-dependencies.sh",
+        "kickstart",
+        "libc++_symbols",
+        "plotgen",
+        "requirements.txt",
+        "runtime",
+        "sample_configs",
+        "symbol_redefine.sh",
+        "trackfm-logo.png"
+      ]
+    },
+    {
+      "repository": "pojntfx/r3map",
+      "url": "https://github.com/pojntfx/r3map.git",
+      "commit": "a98a088b90933c546feb64459476f076c222b937",
+      "tree": "f2ff62eccd5aaf614ebe71ac7e00a72630fd1963",
+      "path": "research/disaggregation/sources/pojntfx--r3map",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "size": 11357
+        },
+        {
+          "path": "README.md",
+          "blob": "247c6be1f3dd86c86a019e7a7c7a0dad2bb705ce",
+          "size": 34453
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".github",
+        ".gitignore",
+        "Hydrunfile",
+        "LICENSE",
+        "Makefile",
+        "README.md",
+        "api",
+        "cmd",
+        "docs",
+        "go.mod",
+        "go.sum",
+        "pkg"
+      ]
+    },
+    {
+      "repository": "pojntfx/ram-dl",
+      "url": "https://github.com/pojntfx/ram-dl.git",
+      "commit": "691e74893f0c09740bea3743d1b912a96e32c63d",
+      "tree": "388c9d57e51d1bc03e6d85ee9bfcb71a2296d533",
+      "path": "research/disaggregation/sources/pojntfx--ram-dl",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "size": 11357
+        },
+        {
+          "path": "README.md",
+          "blob": "620b3de69ff13b20aa39ec162b2a4f21c770aad3",
+          "size": 6590
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".github",
+        ".gitignore",
+        "Hydrunfile",
+        "LICENSE",
+        "Makefile",
+        "README.md",
+        "cmd",
+        "docs",
+        "go.mod",
+        "go.sum"
+      ]
+    },
+    {
+      "repository": "eden-farmem/eden",
+      "url": "https://github.com/eden-farmem/eden.git",
+      "commit": "beca12a7af20bc30de0a3aae1edd2570bb09cee2",
+      "tree": "3324c1e03e81ed58e5ab70902f3701e9061e1b59",
+      "path": "research/disaggregation/sources/eden-farmem--eden",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "size": 11357
+        },
+        {
+          "path": "README.md",
+          "blob": "cb9d586e4c631a79111720b62be02b611dfbf6a4",
+          "size": 1904
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        ".gitmodules",
+        "CONTRIBUTING.md",
+        "LICENSE",
+        "Makefile",
+        "README.md",
+        "apps",
+        "base",
+        "bindings",
+        "client.config",
+        "dpdk",
+        "inc",
+        "iokernel",
+        "jemalloc",
+        "kernel",
+        "ksched",
+        "net",
+        "out",
+        "patches",
+        "rmem",
+        "runtime",
+        "sample.config",
+        "scripts",
+        "server.config",
+        "setup.sh",
+        "shared.mk",
+        "shim",
+        "tests",
+        "tools"
+      ]
+    },
+    {
+      "repository": "rimimadision/safe",
+      "url": "https://github.com/rimimadision/safe.git",
+      "commit": "095cdd357015951f4a0c4df8d0f43f22ceea1583",
+      "tree": "207e6b6e485d7287899244c01fb47d9a66482987",
+      "path": "research/disaggregation/sources/rimimadision--safe",
+      "root_documents": [
+        {
+          "path": "README.md",
+          "blob": "c0307b16dd8a8ab991a73fdc7132e4379940cf81",
+          "size": 3041
+        }
+      ],
+      "licence_status": "no_root_licence_identified_review_required",
+      "root_entries": [
+        ".gitignore",
+        "CMakeLists.txt",
+        "README.md",
+        "bench",
+        "exp",
+        "scripts",
+        "src",
+        "test",
+        "third-party"
+      ]
+    },
+    {
+      "repository": "llnl/umap",
+      "url": "https://github.com/llnl/umap.git",
+      "commit": "9844588c66c1afd4f92c768a308146ce5fbf2e84",
+      "tree": "675a5f42fd7a6884d8b95aa3baa12d56f12f2bf9",
+      "path": "research/disaggregation/sources/llnl--umap",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "fcf5fde3b74593c7c9a39a81873e27cf546e0553",
+          "size": 26027
+        },
+        {
+          "path": "NOTICE",
+          "blob": "3737d5a86ddc20bfd04ce225fff2d34407df06f9",
+          "size": 1167
+        },
+        {
+          "path": "README.md",
+          "blob": "f7e1e1bf7de90b71bdb4e4c1fc352c12f3b62e0c",
+          "size": 5809
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        ".readthedocs.yml",
+        ".travis.yml",
+        "CHANGELOG.md",
+        "CMakeLists.txt",
+        "COPYRIGHT",
+        "Dockerfile",
+        "LICENSE",
+        "NOTICE",
+        "README.md",
+        "RELEASE",
+        "cmake",
+        "config",
+        "docs",
+        "examples",
+        "host-configs",
+        "scripts",
+        "src",
+        "tests",
+        "thirdparty_licenses.md"
+      ]
+    },
+    {
+      "repository": "dmemsys/awesome-disaggregated-memory",
+      "url": "https://github.com/dmemsys/awesome-disaggregated-memory.git",
+      "commit": "af74a73b8e69e19d8b781d43f938ff348a525242",
+      "tree": "f706e0e46b64694a4dde0c48c10968e4b6da7584",
+      "path": "research/disaggregation/sources/dmemsys--awesome-disaggregated-memory",
+      "root_documents": [
+        {
+          "path": "README.md",
+          "blob": "c6b551cddee4a9878e0b6f668e5b31cafa5fa489",
+          "size": 39948
+        }
+      ],
+      "licence_status": "no_root_licence_identified_review_required",
+      "root_entries": [
+        ".gitignore",
+        "README.md"
+      ]
+    },
+    {
+      "repository": "eden-farmem/fltrace",
+      "url": "https://github.com/eden-farmem/fltrace.git",
+      "commit": "cf9f93f2e7c951c574955db660d65ef11b0c4796",
+      "tree": "500890a8003e8df1d3afdd12f42b1693550714e7",
+      "path": "research/disaggregation/sources/eden-farmem--fltrace",
+      "root_documents": [
+        {
+          "path": "LICENSE",
+          "blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "size": 11357
+        },
+        {
+          "path": "README.md",
+          "blob": "3fabfe3e4108ba21620ea88fd05caf5c3830c785",
+          "size": 4122
+        }
+      ],
+      "licence_status": "root_notice_found_review_required",
+      "root_entries": [
+        ".gitignore",
+        ".gitmodules",
+        "LICENSE",
+        "Makefile",
+        "README.md",
+        "deps.sh",
+        "flamegraph-example.svg",
+        "fltrace",
+        "jemalloc",
+        "scripts",
+        "src"
+      ]
+    }
+  ]
+}

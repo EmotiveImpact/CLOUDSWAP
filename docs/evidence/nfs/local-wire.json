@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "host": {
+    "os": "Darwin",
+    "version": "14.5",
+    "architecture": "arm64"
+  },
+  "synthetic_only": true,
+  "system_swap_modified": false,
+  "live_r2": false,
+  "wire": {
+    "passed": true,
+    "bytes_verified": 4194304,
+    "file_sync_acknowledgements": 64,
+    "explicit_commit": true,
+    "crash_reopen": true,
+    "mounted": false,
+    "mismatched_write_rejected": true,
+    "oversized_rpc_rejected": true,
+    "pipelined_writes_verified": 32,
+    "sha256": "9681c1544bd4595ffd307d330b21ed05a01b272b21601be90868f17a69e879e9"
+  },
+  "checkpoint": {
+    "passed": true,
+    "authenticated_rollback_rejected": true,
+    "session_stopped": true
+  },
+  "passed": true,
+  "evidence_source": {
+    "type": "local_mac_execution",
+    "source_revision": "858b0172ee9efb8fead5743b36ad1acec5dbb925",
+    "native_tests": 57,
+    "fuse_helper_tests": 18,
+    "diagnostic_research_tests": 22,
+    "rust_nfs_unit_tests": 2
+  },
+  "regression_before": {
+    "source_revision": "e58429d2d487da8efec900b20ef2e3a28c38a58d",
+    "pipelined_test": "TimeoutError",
+    "source_tree": "2f43378f8de445e6b42310a3eeba8c8b91294372"
+  }
+}

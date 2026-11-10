@@ -23,3 +23,9 @@ These checks establish a buildable foundation, not useful cloud-backed system sw
 Added a Swift XCTest suite exercising request scope and size limits, endpoint validation, a known-answer HMAC vector, signature payload binding, offline/reconnect, timeout propagation and HTTP failure rejection. URLSession uses a redirect-refusing delegate. Test responses are injected using URLProtocol; no physical network loss or live R2 is claimed. CI now executes the Swift suite before building the Mac application.
 
 Still required: secure bucket-scoped R2 credentials and permitted R2 network access; a compatible isolated Mac with driver-development provisioning for the SCSI experiment; a Linux VM for kernel-swap comparison. The native adapter and system-swap attachment remain unimplemented, not completed by these tests.
+
+## Encrypted native reference store
+
+Added PagingStore, a bounded 16 KiB block / 256-block local reference backend. Blocks and the index use AES-GCM; block identity is authenticated. Immutable object writes precede atomic index replacement. A file lock excludes concurrent writers. A write error poisons that instance rather than acknowledging an uncertain result.
+
+Seven additional tests cover close/reopen with the same key, overwrite/reopen, wrong-key rejection, simultaneous writer rejection, corruption, missing-index rejection and bounds. These are real temporary-file tests. They do not yet test abrupt process termination, power loss, rollback of an older valid index, or cloud persistence. Keys are caller-owned and are not saved by the library. This module is not connected to the UI, Rust engine, R2 or a driver yet. Failed writes can leave orphan objects; automatic reclamation remains pending. No system swap configuration changes are made.

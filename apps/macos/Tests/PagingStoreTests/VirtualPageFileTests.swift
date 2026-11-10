@@ -82,6 +82,14 @@ final class VirtualPageFileTests: XCTestCase {
         let result = try await file.read(offset: 0, count: expected.count)
         XCTAssertEqual(result, expected)
     }
+    func testDataSliceWithNonzeroStartIndexAcrossPageBoundary() async throws {
+        let file = VirtualPageFile(backend: TestPages())
+        let slice = Data([0, 1, 2, 3, 4]).dropFirst(2)
+        XCTAssertEqual(slice.startIndex, 2)
+        _ = try await file.write(offset: 16383, data: slice)
+        let result = try await file.read(offset: 16382, count: 5)
+        XCTAssertEqual(result, Data([0, 2, 3, 4, 0]))
+    }
     func testInvalidRangesDoNotPoison() async throws {
         let file = VirtualPageFile(backend: TestPages())
         for (offset, count) in [(-1, 1), (0, -1), (0, 65537)] {

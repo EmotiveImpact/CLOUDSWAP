@@ -7,7 +7,7 @@
 | CS-03 | Portable Rust failure policy | Unit tests cover bounds, missing data, overwrite, uncertain writes | Complete for emulator scope |
 | CS-04 | Native encrypted R2 probe | PUT/GET authentication, cleanup, actual timings | Built; live R2 credentials/access needed |
 | CS-05 | Linux VM swap experiment | Nonzero swap I/O and post-page-in checksums under controlled memory pressure | Verified against loopback HTTP service; live R2 pending |
-| CS-06 | Mac storage-adapter proof | SCSI software-I/O capability and entitlements resolved; scratch reads/writes/flush pass | Research gate; not implemented |
+| CS-06 | Mac storage-adapter proof | Mounted reads/writes/flush verified; chosen runtime and kernel paging requirements resolved | Native encrypted file server and optional FUSE frontend implemented; callbacks/process recovery tested, actual mount unverified |
 | CS-07 | Mac swap attachment proof | XNU measurably pages a sacrificial process through adapter | Unresolved; no supported registration route established |
 | CS-08 | Production engine | Encrypted journal/index recovery, bounded caches, concurrency and failure tests | Native bounded stores, descriptor identity and full mirror implemented; production recovery/key management unfinished |
 | CS-09 | Wi-Fi trials | 1/10/60 second outages, packet blackhole, reconnect, sleep/wake; integrity and stalls measured | Pending live trials |

@@ -44,7 +44,8 @@ public actor VirtualPageFile {
             let within = position % PagingStore.blockSize
             let length = min(PagingStore.blockSize - within, end - position)
             let bytes = try await page(block)
-            result.append(bytes.subdata(in: within..<(within + length)))
+            let start = bytes.startIndex + within
+            result.append(bytes.subdata(in: start..<(start + length)))
             position += length
         }
         return result
@@ -62,7 +63,9 @@ public actor VirtualPageFile {
                 let length = min(PagingStore.blockSize - within, data.count - consumed)
                 var bytes = within == 0 && length == PagingStore.blockSize
                     ? Data(repeating: 0, count: PagingStore.blockSize) : try await page(block)
-                bytes.replaceSubrange(within..<(within + length), with: data[consumed..<(consumed + length)])
+                let destination = bytes.startIndex + within
+                let source = data.startIndex + consumed
+                bytes.replaceSubrange(destination..<(destination + length), with: data[source..<(source + length)])
                 try await backend.write(block: block, data: bytes)
                 consumed += length
             }

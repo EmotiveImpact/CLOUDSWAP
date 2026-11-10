@@ -25,6 +25,11 @@ python3 labs/macos-fuse/cloudswap_fuse.py --self-test --helper "$CLOUDSWAP_FILE_
 
 The tests require Python 3.9+ and a Mac-built helper. If `CLOUDSWAP_FILE_HELPER`
 is omitted, native process integration tests are explicitly skipped. CI sets it.
+The foundation workflow now runs Mac builds and these tests on `macos-latest`
+(arm64) and `macos-15-intel`, recording the OS and toolchain. This checks software
+portability across CI hosts; physical drive, Wi-Fi, mounting and swap trials still
+require their own lab evidence. Runner labels are documented by
+[GitHub](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job).
 The standalone self-test always starts the real helper. It creates synthetic
 pages, closes and relaunches the helper using the same caller-held key, verifies
 the whole 4 MiB file, then deletes its temporary directory. It reports

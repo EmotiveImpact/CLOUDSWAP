@@ -53,3 +53,7 @@ The [Linux kernel swap lab](https://github.com/EmotiveImpact/CLOUDSWAP/actions/w
 The [first run](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42817073745) recorded 6,120 page-outs and 6,151 page-ins in the healthy case. The probe verified all 24 MiB. With an immediate read failure during a one-second service disconnect, the workload received SIGBUS. The outage harness interrupts HTTP connections on loopback. R2 and physical network or drive loss still require separate trials.
 
 The lab compares a 2.5-second retry budget against one-second and four-second service outages. The native R2 pager applies the same budget to immutable page reads after transient network errors. HTTP responses such as 404 propagate immediately. Writes retain their existing uncertain-acknowledgement policy.
+
+## Combined storage trial, 10 November 2026
+
+38 native tests passed (29 main-branch tests plus nine new lifecycle/transport cases). Release build, deep/strict signature check, existing helper self-tests and the packaged tiered synthetic trial passed. [The normalised report](evidence/tiered-release-simulation.json) records 64 remote writes/reads, offline mirror recovery, rejection of one offline write, last-committed-page recovery and successful object/file cleanup. This is simulated remote storage with real local encrypted files, not a live cloud, physical disconnect or system-swap test. See [trial documentation](TIERED-STORAGE-TRIAL.md) for scope and measurements.

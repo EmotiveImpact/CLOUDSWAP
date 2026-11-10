@@ -9,7 +9,7 @@
 | CS-05 | Linux VM swap experiment | Nonzero swap I/O and post-page-in checksums under controlled memory pressure | Verified against loopback HTTP service; live R2 pending |
 | CS-06 | Mac storage-adapter proof | SCSI software-I/O capability and entitlements resolved; scratch reads/writes/flush pass | Research gate; not implemented |
 | CS-07 | Mac swap attachment proof | XNU measurably pages a sacrificial process through adapter | Unresolved; no supported registration route established |
-| CS-08 | Production engine | Encrypted journal/index recovery, bounded caches, concurrency and failure tests | Native bounded stores, descriptor identity and full mirror implemented; production recovery/key management unfinished |
+| CS-08 | Production engine | Encrypted journal/index recovery, bounded caches, concurrency and failure tests | Native bounded stores and full mirror implemented; combined cloud/mirror trial added; production recovery/key management unfinished |
 | CS-09 | Wi-Fi trials | 1/10/60 second outages, packet blackhole, reconnect, sleep/wake; integrity and stalls measured | Pending live trials |
 | CS-10 | Usability and space trial | Saved allocated disk bytes net of fallback; p50/p95/p99 delays; app survival | Pending |
 | CS-11 | Cairn storage integration | Durable file restore contract and separate consent/eviction design | Separate future track |

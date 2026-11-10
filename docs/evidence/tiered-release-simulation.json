@@ -1,0 +1,27 @@
+{
+  "mode": "simulated_remote_with_real_local_mirror",
+  "passed": true,
+  "report": {
+    "blockedOperations": 1,
+    "directory": "<temporary trial directory; path normalised>",
+    "localAllocatedBytes": 1335296,
+    "localFilesRemoved": true,
+    "logicalBytes": 1048576,
+    "mirrorReadP95Milliseconds": 0.041791,
+    "physicalDisconnectTested": false,
+    "remoteGets": 64,
+    "remoteObjectsRemaining": [],
+    "remotePuts": 64,
+    "remoteReadP95Milliseconds": 0.024833,
+    "schemaVersion": 1,
+    "stages": [
+      "upload_and_mirror",
+      "remote_read_after_reopen",
+      "offline_mirror_after_reopen",
+      "offline_write_stops_session",
+      "recover_last_committed_page"
+    ],
+    "storageChecksPassed": true,
+    "systemSwapTested": false
+  }
+}

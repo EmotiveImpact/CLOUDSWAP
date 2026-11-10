@@ -46,3 +46,5 @@ Cairn may later reuse cloud storage and retrieval components for file offloading
 ## Kernel research and multiple Macs
 
 Pinned XNU, ipsw and symbolicator source checkouts are included as Git submodules. Run `git submodule update --init --recursive` to fetch them. Read the [kernel source findings](research/kernel/FINDINGS.md) and [multi-Mac test plan](docs/MULTI-MAC-TEST-PLAN.md). The newly identified `vm.swapfileprefix` candidate is unverified on a running target; no system swap changes have been made. `python3 scripts/mac-capabilities.py` collects a read-only report for each test Mac.
+
+Use the [combined cloud and local-mirror trial](docs/TIERED-STORAGE-TRIAL.md) to verify remote reads, simulated offline recovery, failed-write handling and allocated file sizes. Available through the Mac menu or R2Lab CLI.

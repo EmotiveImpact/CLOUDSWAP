@@ -84,3 +84,7 @@ Run `python3 scripts/mac-capabilities.py` on each target to collect a read-only 
 8. Keep Cairn file offloading separate until durable file restore, keys, metadata and consent are designed.
 
 User expects continued implementation and testing without repeated requests to proceed. Report genuine missing access/hardware/credentials precisely. Do not equate passing storage tests with a completed Mac swap product.
+
+## Combined cloud and mirror trial
+
+See [TIERED-STORAGE-TRIAL.md](TIERED-STORAGE-TRIAL.md). The menu now includes a synthetic remote/offline-mirror trial using a selected local/external folder. R2Lab accepts --tiered-self-test and --tiered-live --directory EXISTING_FOLDER; the latter uses the real R2 adapter and an injected outage. Shared TieredTrial verifies remote reads separately from mirror reads, rejects offline writes, reopens the last committed page, measures allocated trial-file bytes and reports cleanup failures. Keys are ephemeral and reopen is within-process only. 38 native tests, the release build/signature and packaged synthetic trial passed. No credentials were available for a live R2 run. Native system swap remains unattached.

@@ -23,3 +23,4 @@ jobs:
       - run: bash scripts/build-mac.sh
       - run: dist/CLOUDSWAP.app/Contents/Helpers/cloudswap-lab
       - run: dist/CLOUDSWAP.app/Contents/Helpers/R2Lab --self-test
+      - run: dist/CLOUDSWAP.app/Contents/Helpers/R2Lab --tiered-self-test

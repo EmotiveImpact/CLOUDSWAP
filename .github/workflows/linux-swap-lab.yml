@@ -1,0 +1,31 @@
+name: Linux kernel swap lab
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  kernel-swap:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install guest tools and kernel
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends busybox-static cpio qemu-system-x86 nbdkit nbdkit-plugin-python python3-cryptography linux-image-virtual zstd
+      - name: Build disposable guest and exercise swap
+        run: |
+          set -euo pipefail
+          kernel=$(find /boot -maxdepth 1 -name 'vmlinuz-*-generic' | sort -V | tail -1)
+          test -n "$kernel"
+          version=$(basename "$kernel" | sed 's/^vmlinuz-//')
+          work=$(mktemp -d)
+          sudo install -m 644 "$kernel" "$work/kernel"
+          bash labs/linux-vm/build-guest.sh "$work" "$version"
+          /usr/bin/python3 labs/linux-vm/run.py --kernel "$work/kernel" --initrd "$work/initrd.gz" --results lab-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linux-swap-evidence
+          path: lab-results/

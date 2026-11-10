@@ -220,17 +220,18 @@ def backing_measurement(running, path):
             'backing_excludes_filesystem_directory_overhead': True}
 
 
-def mount_trial(binary, helper, root, env):
+def mount_trial(binary, helper, root, env, report):
     if platform.system() != 'Darwin': raise ValueError('Mac mount required')
     mountpoint = root / 'mount'; mountpoint.mkdir()
     running = None
-    report = {'passed': False, 'system_swap_modified': False, 'live_r2': False}
+    report.update(passed=False, system_swap_modified=False, live_r2=False)
     def unmount():
         if os.path.ismount(mountpoint):
             result = subprocess.run(['sudo', '-n', '/sbin/umount', '-f', str(mountpoint)], capture_output=True, timeout=20)
             if result.returncode or os.path.ismount(mountpoint): raise OSError('Lab unmount failed')
     try:
         for stage in ('create', 'verify', 'truncate', 'verify_truncated', 'pause'):
+            report['active_stage'] = stage
             print('Sparse mounted stage: ' + stage, file=sys.stderr, flush=True)
             running = server(binary, helper, 'local-create' if stage == 'create' else 'local-open', root / 'mount-store', env)
             options = f'vers=3,tcp,nolocks,soft,timeo=10,retrans=1,rsize=65536,wsize=65536,actimeo=0,nosuid,nodev,port={running.port},mountport={running.port}'
@@ -260,6 +261,7 @@ def mount_trial(binary, helper, root, env):
                     'worker_elapsed_seconds': round(time.monotonic() - started, 3), 'physical_wifi_drop': False}
             unmount(); running.stop(); running = None
         report.update(passed=True, fresh_mount_and_process_reopen=True)
+        report.pop('active_stage')
         return report
     finally:
         unmount()
@@ -289,7 +291,11 @@ def main():
         binary, helper = args.server.resolve(strict=True), args.helper.resolve(strict=True)
         report['wire'] = wire_trial(binary, helper, root, env)
         report['checkpoint'] = checkpoint_trial(binary, helper, root, env)
-        if args.ci_mount: report['mount'] = mount_trial(binary, helper, root, env)
+        if args.ci_mount:
+            # Keep completed stages and the failing stage if a later operation
+            # raises, so the saved artefact remains useful after cleanup.
+            report['mount'] = {}
+            mount_trial(binary, helper, root, env, report['mount'])
         report['passed'] = True
     except Exception as error:
         report.update(passed=False, error_type=type(error).__name__, diagnostic=str(error)[:1500])

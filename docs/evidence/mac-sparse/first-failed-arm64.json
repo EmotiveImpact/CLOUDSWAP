@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "system_swap_modified": false,
+  "live_r2": false,
+  "host": {
+    "architecture": "arm64",
+    "macos": "15.8.2"
+  },
+  "wire": {
+    "passed": true,
+    "sparse_size_bytes": 1073741824,
+    "payload_bytes_verified": 196608,
+    "crash_reopen": true,
+    "shrink_regrow_zeroes": true,
+    "exclusive_retry": true,
+    "rename_replacement_and_stale_handles": true,
+    "attributes_persisted": true,
+    "quota_report_not_upstream_one_tib_default": true
+  },
+  "checkpoint": {
+    "passed": true,
+    "rollback_stopped_session": true
+  },
+  "passed": false,
+  "error_type": "OSError",
+  "diagnostic": "Mounted worker failed: Traceback (most recent call last):\n  File \"/Users/runner/work/CLOUDSWAP/CLOUDSWAP/labs/macos-nfs/sparse_lab.py\", line 279, in <module>\n    if __name__ == '__main__': main()\n                               ~~~~^^\n  File \"/Users/runner/work/CLOUDSWAP/CLOUDSWAP/labs/macos-nfs/sparse_lab.py\", line 252, in main\n    print(json.dumps(mounted_worker(*args.worker))); return\n                     ~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/Users/runner/work/CLOUDSWAP/CLOUDSWAP/labs/macos-nfs/sparse_lab.py\", line 189, in mounted_worker\n    if stat.st_blocks * 512 >= 2 * 1024 ** 2: raise ValueError('Unexpected materialised page count')\n                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Unexpected materialised page count\n"
+}

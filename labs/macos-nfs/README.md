@@ -6,6 +6,12 @@ FUSE adapter. No third-party filesystem runtime, kernel extension or system swap
 configuration is needed for this file test. This is a laboratory, not a system
 swap service or a production network export.
 
+An additional opt-in `--sparse-lab` mode now supports growable encrypted files,
+including create, resize, truncate/regrow, rename/replacement and deletion.
+Its separate helper protocol, object limits, allocation measurements and
+acceptance tests are documented in [SPARSE-VOLUME.md](../../docs/SPARSE-VOLUME.md).
+The fixed-file contract below describes the original `--synthetic-lab` mode.
+
 The loopback wire test passes locally: 64 FILE_SYNC writes (32 pipelined), explicit COMMIT,
 server/helper process-group death and a full 4 MiB recovery from a fresh process.
 Actual mounting is tested separately in the `Mounted Mac storage lab` workflow

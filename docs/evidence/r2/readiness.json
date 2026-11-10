@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "scope": "live_r2_synthetic_storage",
+  "configured": false,
+  "missing_variables": [
+    "R2_ENDPOINT",
+    "R2_BUCKET",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY"
+  ],
+  "state": "configuration_unavailable",
+  "live_r2_tested": false,
+  "passed": false,
+  "system_swap_modified": false,
+  "cloud_system_swap_verified": false,
+  "physical_disconnect_tested": false,
+  "probes": [],
+  "provenance": {
+    "run_id": 42849542676,
+    "job_id": 129946076904,
+    "revision": "6d2ad493c9546f604d46769db2f96dc6c74a9583",
+    "artifact_id": 13777929794,
+    "artifact_sha256": "fd8d4725f0553bc22074b7e8a9472f292fb76a72d4fb1b6f77077390f7262180"
+  }
+}

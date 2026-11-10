@@ -1,0 +1,41 @@
+name: Disposable Mac swap placement evidence
+on:
+  pull_request:
+    paths:
+      - 'labs/macos-swap-placement/**'
+      - '.github/workflows/mac-swap-placement.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mac-placement-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  placement:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15-intel, macos-15]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build bounded workload and test its refusal guards
+        run: |
+          clang -O2 -Wall -Wextra -Werror labs/macos-swap-placement/probe.c -o "$RUNNER_TEMP/cloudswap-memory-probe"
+          CLOUDSWAP_MEMORY_PROBE="$RUNNER_TEMP/cloudswap-memory-probe" python3 -m unittest discover -s labs/macos-swap-placement -v
+      - name: Collect separate-volume placement evidence in this disposable runner
+        run: |
+          mkdir -p placement-results
+          sudo -n env GITHUB_ACTIONS=true RUNNER_ENVIRONMENT=github-hosted \
+            GITHUB_REPOSITORY="$GITHUB_REPOSITORY" RUNNER_TEMP="$RUNNER_TEMP" \
+            CLOUDSWAP_CI_PLACEMENT=explicit-disposable-test \
+            python3 labs/macos-swap-placement/lab.py --ci-change-prefix-on-disposable-runner \
+              --probe "$RUNNER_TEMP/cloudswap-memory-probe" --report placement-results/result.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: placement-${{ matrix.runner }}
+          path: placement-results/

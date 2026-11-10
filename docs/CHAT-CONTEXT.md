@@ -84,3 +84,14 @@ virtual-volume experiment: actual kernel page-out/page-in traces were captured,
 and all 8.0625 GiB of the synthetic workload verified. This is not yet physical
 external-SSD certification, cloud-backed system swap or a product activation
 feature. The working Mac's swap configuration remains unchanged.
+
+
+The final placement follow-through also passed on Apple Silicon macOS 15.8.2:
+separate-volume kernel page-out/page-in was observed while all 3.375 GiB of the
+synthetic workload verified. These are volume-level observations, not proof of
+which allocation paged. PR #8 merged the earlier six PRs into main; PR #10
+merged a live R2 acceptance workflow. That workflow confirmed that none of the
+four required secrets is configured and skipped real R2 access. The source,
+research pins, reports, limitations and continuation instructions are preserved.
+The user's original goal still requires production integration, physical-drive
+trials, live R2, real app survival and net-space measurements.

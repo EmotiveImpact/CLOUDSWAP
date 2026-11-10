@@ -31,3 +31,11 @@ not network acceptance. The actual helper transport already has native tests.
 This proves storage interoperability only when a live report passes. It does
 not attach R2 to macOS system swap, exercise a physical Wi-Fi drop, preserve
 real application memory, or establish useful performance and disk savings.
+
+
+## Recorded configuration result, 10 November 2026
+
+[Main run 42849542676](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42849542676)
+passed the six runner tests and recorded all four required secrets as absent.
+The live Mac job skipped. `docs/evidence/r2/readiness.json` preserves the report
+and provenance. No live R2 request or successful cloud acceptance is claimed.

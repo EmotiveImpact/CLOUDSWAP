@@ -1,0 +1,115 @@
+# Disposable Mac swap-placement experiment
+
+This is a separately scoped kernel experiment, not an app feature or a command
+to run on a working Mac. The previous hosted Intel test read `vm.swapfileprefix`
+and successfully wrote its unchanged stock value. Apple source shows that the
+kernel uses this prefix when creating future swap files. Neither observation
+proves that another volume can carry actual pages.
+
+The CI workflow now investigates a separate APFS **disk-image volume** on a
+disposable hosted Intel Mac. It does not use a physical external SSD, change
+startup security, install a driver, run dynamic_pager or remove live swap files.
+The workflow repeats this on Intel and Apple Silicon macOS 15; each remains
+a distinct result, not an inherited pass.
+
+## Reviewed execution and recovery boundaries
+
+1. Require the explicit disposable-test CLI flag, root and the hosted CLOUDSWAP
+   CI environment. These are accident-prevention checks, not authentication
+   against a person deliberately forging their own environment.
+2. Require the stock prefix and zero configured swap before setup, then check
+   both again immediately before changing the prefix. Refuse an existing setup.
+3. Require at least 8 GiB free disk space. Create a new 6 GiB sparse APFS image
+   and verify a different filesystem device identity from the internal VM volume.
+4. Change only the prefix to the unique mounted volume. Preserve a report before
+   pressure. A bounded C process writes deterministic, incompressible synthetic
+   anonymous memory, then verifies every word. It stops growing after observing
+   swap-out activity or reaching its limit. It reserves at least 2 GiB of RAM,
+   uses at most 85% of physical RAM, caps touched memory at 12 GiB and has a
+   120-second alarm. The Python supervisor has its own 150-second deadline.
+5. Record same-boot paging snapshots, target-file identities/allocation changes,
+   workload integrity, global swap-in/out deltas and filtered fs_usage lines.
+   The trace retains at most 200 target swap-file I/O lines and 40 target-volume
+   metadata lines. It counts matching events beyond the retained-line cap.
+6. Restore the original prefix if it still equals our test prefix. This only
+   controls future files; it is **not a drain or migration**. After any attempted
+   prefix change, leave the volume mounted and its image intact until the hosted
+   runner is destroyed. Never detach a possible live swap volume during cleanup.
+
+An interrupted or failed experiment may leave the test volume mounted until
+runner teardown. It must not be reused as a local-machine installation procedure.
+This code was reviewed for the mutation boundary, timeout path and retained-volume
+behaviour before its first CI run. No placement experiment was run on the user's Mac.
+
+## Result interpretation
+
+`candidate_observed` requires both growing/new target swap files and global
+swap-out activity while the prefix points at that volume. It is correlation,
+as defined by `scripts/mac-swap-evidence.py`; do not promote it to an external
+SSD certification or native app survival claim. Inspect the target I/O trace,
+counter deltas and exact workload result separately. The workload reports global
+counters, not per-process attribution.
+
+`no_candidate_observed`, skipped preconditions and rejected control writes are
+valid negative observations, never positive acceptance. Integrity failures,
+exceptions and inability to confirm prefix restoration fail the workflow.
+`native_virtual_volume_paging_observed` additionally requires both target-device
+page-out and page-in trace events and successful synthetic integrity verification.
+It does not identify which allocation faulted; global counters remain global.
+The JSON always leaves physical external/cloud swap unverified. CI completion
+alone is not a paging proof, and this experiment measures no net disk saving.
+
+## Safe local checks
+
+The small workload uses 32 MiB and does not change swap configuration:
+
+```sh
+clang -O2 -Wall -Wextra -Werror labs/macos-swap-placement/probe.c -o /tmp/cloudswap-memory-probe
+CLOUDSWAP_MEMORY_PROBE=/tmp/cloudswap-memory-probe \
+  python3 -m unittest discover -s labs/macos-swap-placement -v
+```
+
+The tests verify the memory limits, every word of the small allocation, invalid
+size rejection, refusal of a large workload without the explicit CI flag, and
+refusal of the placement harness before writing any report or changing settings.
+Do not copy the privileged workflow invocation into a normal terminal.
+
+## First observed result
+
+[Hosted Intel run 42845793503](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42845793503)
+at `fc619cdd504ed9cdf0f665b1c4e461e353affc0f` created a 1 GiB swap file on the
+separate APFS volume, reported 896 4 KiB swap-out pages and 832 swap-in pages, and
+verified all 8.0625 GiB of its synthetic workload. The captured trace contains
+14 `PgOut` and two `PgIn` events naming that volume's swap file and `disk3s1`.
+The prefix was restored and the volume deliberately retained until teardown.
+
+The first report's derived trace counters incorrectly looked for `PAGE_OUT` and
+`PAGE_IN`, so they show zero despite the preserved raw events. The parser now
+recognises the actual `PgOut[...]`/`PgIn[...]` form, checks the exact device and
+swap-file path, and has a regression test using that format. The original report
+is preserved unchanged apart from added source provenance in
+`docs/evidence/mac-placement/intel-first.json`; do not silently rewrite its fields.
+Its nested `system_swap_modified: false` fields describe the read-only collector,
+not the enclosing experiment, which did change the prefix. New reports separate
+collector actions from experiment actions explicitly.
+
+## Repeated result and attribution correction
+
+[Run 42847101980](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42847101980)
+at `8787b968cc776f76787be1bb89bfd42d2857f151` again observed native paging on
+Intel macOS 15.7.9. All 8.25 GiB of synthetic memory verified. The target trace
+captured 130 page-outs (34,004,992 bytes) and seven page-ins (1,835,008 bytes),
+and the original prefix was restored. Trace byte counts need not equal global
+counter deltas; neither is a claim that all test memory was swapped.
+
+Apple's [fs_usage manual](https://github.com/apple-oss-distributions/system_cmds/blob/main/fs_usage/fs_usage.1)
+specifies that the numeric suffix is a **thread ID**, not a process ID. The
+repeat report's `workload_target_pageins` field incorrectly compared it to the
+probe PID and must not be used for attribution. The original result remains in
+`docs/evidence/mac-placement/intel-repeat.json` with this qualification. Schema
+2 removes that comparison, explicitly reports attribution as unestablished,
+and tests that the parser never calls this suffix a PID. The volume-specific
+page-out/page-in proof does not depend on that removed field.
+
+The Apple Silicon placement job was queued when these results were recorded.
+No architecture-specific placement result is inferred from Intel success.

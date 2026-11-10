@@ -11,30 +11,30 @@ public protocol ObjectBackend {
 /// Busy rejects overlapping operations, including actor re-entry during network awaits.
 public actor RemotePager {
     let directory: URL
+    let storage: StoreDirectory
     let key: SymmetricKey
     let backend: ObjectBackend
+    let mirror: Bool
     let fileLock: FileLock
     var index: [String: String]
     var busy = false
     var poisoned = false
     static let aad = Data("cloudswap-remote-index-v1".utf8)
 
-    public init(directory: URL, key: SymmetricKey, backend: ObjectBackend, create: Bool = false) throws {
-        self.directory = directory; self.key = key; self.backend = backend
+    public init(directory: URL, key: SymmetricKey, backend: ObjectBackend, create: Bool = false, mirror: Bool = false) throws {
+        self.directory = directory; self.key = key; self.backend = backend; self.mirror = mirror
         if create {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
         }
-        let fd = Darwin.open(directory.appendingPathComponent("writer.lock").path, O_CREAT | O_RDWR | O_NOFOLLOW, 0o600)
-        guard fd >= 0 else { throw PagingError.busy }
-        guard flock(fd, LOCK_EX | LOCK_NB) == 0 else { Darwin.close(fd); throw PagingError.busy }
-        fileLock = FileLock(fd)
-        let path = directory.appendingPathComponent("remote-index.enc")
+        let storage = try StoreDirectory(directory)
+        self.storage = storage
+        fileLock = try storage.lock()
         if create {
             guard try FileManager.default.contentsOfDirectory(atPath: directory.path).allSatisfy({ $0 == "writer.lock" }) else { throw PagingError.invalid }
             index = [:]
-            try Self.save([:], directory: directory, key: key)
+            try Self.save([:], storage: storage, key: key)
         } else {
-            let bytes = try Data(contentsOf: path)
+            let bytes = try storage.read("remote-index.enc")
             let decoded = try AES.GCM.open(AES.GCM.SealedBox(combined: bytes), using: key, authenticating: Self.aad)
             index = try JSONDecoder().decode([String: String].self, from: decoded)
             guard index.count <= PagingStore.maxBlocks else { throw PagingError.invalid }
@@ -43,16 +43,29 @@ public actor RemotePager {
                       UUID(uuidString: object) != nil else { throw PagingError.invalid }
             }
         }
+        if mirror {
+            // Reopening in protected mode requires every committed page to be present.
+            for (block, object) in index {
+                let bytes = try storage.read(object)
+                let plain = try AES.GCM.open(AES.GCM.SealedBox(combined: bytes), using: key,
+                                            authenticating: Data("\(block)/\(object)".utf8))
+                guard plain.count == PagingStore.blockSize else { throw PagingError.invalid }
+            }
+        }
     }
-    static func save(_ index: [String: String], directory: URL, key: SymmetricKey) throws {
+    public func localProtectionBytes() -> Int {
+        mirror ? index.count * (PagingStore.blockSize + 28) : 0
+    }
+    static func save(_ index: [String: String], storage: StoreDirectory, key: SymmetricKey) throws {
         let data = try JSONEncoder().encode(index)
         let sealed = try AES.GCM.seal(data, using: key, authenticating: aad).combined!
-        try sealed.write(to: directory.appendingPathComponent("remote-index.enc"), options: .atomic)
+        try storage.write("remote-index.enc", data: sealed)
     }
     func begin(_ block: Int) throws {
         guard !poisoned else { throw PagingError.poisoned }
         guard !busy else { throw PagingError.busy }
         guard block >= 0, block < PagingStore.maxBlocks else { throw PagingError.invalid }
+        do { try storage.validate() } catch { poisoned = true; throw error }
         busy = true
     }
     public func write(block: Int, data: Data) async throws {
@@ -62,15 +75,25 @@ public actor RemotePager {
         let payload = try AES.GCM.seal(data, using: key, authenticating: Data("\(block)/\(object)".utf8)).combined!
         var next = index; next[String(block)] = object
         do {
+            if mirror { try storage.write(object, data: payload) }
             try await backend.put(key: "cloudswap-lab/\(object)/probe", data: payload)
-            try Self.save(next, directory: directory, key: key)
+            try Self.save(next, storage: storage, key: key)
+            let old = index[String(block)]
             index = next
+            if mirror, let old = old { storage.remove(old) }
         } catch { poisoned = true; throw error }
     }
     public func read(block: Int) async throws -> Data {
         try begin(block); defer { busy = false }
         guard let object = index[String(block)] else { throw PagingError.missing }
-        let bytes = try await backend.get(key: "cloudswap-lab/\(object)/probe")
+        let bytes: Data
+        if mirror {
+            do { bytes = try storage.read(object) }
+            catch { poisoned = true; throw error }
+        } else {
+            bytes = try await backend.get(key: "cloudswap-lab/\(object)/probe")
+        }
+        do { try storage.validate() } catch { poisoned = true; throw error }
         let data = try AES.GCM.open(AES.GCM.SealedBox(combined: bytes), using: key,
                                     authenticating: Data("\(block)/\(object)".utf8))
         guard data.count == PagingStore.blockSize else { throw PagingError.invalid }

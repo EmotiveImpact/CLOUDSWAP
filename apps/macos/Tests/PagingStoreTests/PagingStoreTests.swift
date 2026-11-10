@@ -53,4 +53,37 @@ final class PagingStoreTests: XCTestCase {
         XCTAssertThrowsError(try store.write(block: PagingStore.maxBlocks, data: data))
         XCTAssertThrowsError(try store.write(block: 0, data: Data([1])))
     }
+    func testReplacedDirectoryNeverReceivesWrites() throws {
+        let store = try create()
+        try store.write(block: 0, data: data)
+        let moved = root.appendingPathExtension("detached")
+        defer { try? FileManager.default.removeItem(at: moved) }
+        try FileManager.default.moveItem(at: root, to: moved)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        XCTAssertThrowsError(try store.write(block: 1, data: data))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: root.path), [])
+        XCTAssertThrowsError(try store.read(block: 0))
+    }
+    func testDisconnectRequiresReopenEvenAfterPathReturns() throws {
+        var store: PagingStore? = try create()
+        try store!.write(block: 0, data: data)
+        let moved = root.appendingPathExtension("detached")
+        try FileManager.default.moveItem(at: root, to: moved)
+        XCTAssertThrowsError(try store!.read(block: 0))
+        try FileManager.default.moveItem(at: moved, to: root)
+        XCTAssertThrowsError(try store!.read(block: 0))
+        store = nil
+        XCTAssertEqual(try create().read(block: 0), data)
+    }
+    func testObjectSymlinkRejected() throws {
+        let store = try create()
+        try store.write(block: 0, data: data)
+        let object = try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)
+            .first { UUID(uuidString: $0.lastPathComponent) != nil }!
+        let copy = root.appendingPathComponent("copy")
+        try FileManager.default.moveItem(at: object, to: copy)
+        try FileManager.default.createSymbolicLink(at: object, withDestinationURL: copy)
+        XCTAssertThrowsError(try store.read(block: 0))
+    }
+
 }

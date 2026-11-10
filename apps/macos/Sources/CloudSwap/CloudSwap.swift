@@ -1,6 +1,8 @@
 import SwiftUI
 import Darwin
 import Network
+import CryptoKit
+import PagingStore
 
 struct Scenario: Decodable { let name: String; let passed: Bool }
 struct LabResult: Decodable { let mode: String; let passed: Bool; let scenarios: [Scenario] }
@@ -35,6 +37,44 @@ struct LabResult: Decodable { let mode: String; let passed: Bool; let scenarios:
            let bytes = attributes[.systemFreeSize] as? NSNumber {
             free = ByteCountFormatter.string(fromByteCount: bytes.int64Value, countStyle: .binary)
         } else { free = "Unavailable" }
+    }
+    func runDriveLab() {
+        guard !running else { return }
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false
+        panel.prompt = "Test this folder"
+        panel.message = "Choose a folder on the external drive. CLOUDSWAP writes and verifies 1 MiB of encrypted synthetic data in a temporary subfolder."
+        guard panel.runModal() == .OK, let selected = panel.url else { return }
+        running = true
+        scenarios = []
+        labStatus = "Writing and verifying encrypted test pages…"
+        Task {
+            let result = await Task.detached { () -> String in
+                let root = selected.appendingPathComponent("cloudswap-test-" + UUID().uuidString)
+                do {
+                    let key = SymmetricKey(size: .bits256)
+                    var store: PagingStore? = try PagingStore(directory: root, key: key)
+                    for block in 0..<64 {
+                        try store!.write(block: block, data: Data(repeating: UInt8(block), count: PagingStore.blockSize))
+                    }
+                    store = nil
+                    let reopened = try PagingStore(directory: root, key: key)
+                    for block in 0..<64 {
+                        guard try reopened.read(block: block) == Data(repeating: UInt8(block), count: PagingStore.blockSize) else {
+                            throw PagingError.invalid
+                        }
+                    }
+                    try FileManager.default.removeItem(at: root)
+                    return "Passed: 1 MiB verified after reopening; test files removed. This does not test unplugging or system swap."
+                } catch {
+                    return "Drive test failed. Encrypted synthetic files may remain in \(root.lastPathComponent). No system swap was changed."
+                }
+            }.value
+            labStatus = result
+            running = false
+        }
     }
     func runLab() {
         guard !running else { return }
@@ -86,6 +126,8 @@ struct LabResult: Decodable { let mode: String; let passed: Bool; let scenarios:
                 Text("Test the storage failure policy with synthetic data. Your apps and Mac swap are unchanged.")
                     .font(.caption).foregroundStyle(.secondary)
                 Button(monitor.running ? "Running…" : "Run connection-loss simulation") { monitor.runLab() }
+                    .disabled(monitor.running)
+                Button("Test external drive folder…") { monitor.runDriveLab() }
                     .disabled(monitor.running)
                 Text(monitor.labStatus).font(.caption)
                 ForEach(monitor.scenarios, id: \.name) { item in

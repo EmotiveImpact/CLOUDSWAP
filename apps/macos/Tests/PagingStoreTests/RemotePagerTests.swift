@@ -66,4 +66,58 @@ final class RemotePagerTests: XCTestCase {
         try await p.write(block: 0, data: payload); await backend.corrupt()
         do { _ = try await p.read(block: 0); XCTFail() } catch { }
     }
+    func testReplacedIndexDirectoryStopsSession() async throws {
+        let backend = MemoryObjects()
+        var pager: RemotePager? = try RemotePager(directory: root, key: key, backend: backend, create: true)
+        try await pager!.write(block: 0, data: payload)
+        let moved = root.appendingPathExtension("detached")
+        defer { try? FileManager.default.removeItem(at: moved) }
+        try FileManager.default.moveItem(at: root, to: moved)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        do { try await pager!.write(block: 1, data: payload); XCTFail("Replacement accepted") }
+        catch PagingError.unavailable { }
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: root.path), [])
+        try FileManager.default.removeItem(at: root)
+        try FileManager.default.moveItem(at: moved, to: root)
+        do { _ = try await pager!.read(block: 0); XCTFail("Session resumed without reopen") }
+        catch PagingError.poisoned { }
+        pager = nil
+        let reopened = try RemotePager(directory: root, key: key, backend: backend)
+        let restored = try await reopened.read(block: 0)
+        XCTAssertEqual(restored, payload)
+    }
+
+    func testMirrorSurvivesOfflineReopenAndReportsBytes() async throws {
+        let backend = MemoryObjects()
+        var pager: RemotePager? = try RemotePager(directory: root, key: key, backend: backend, create: true, mirror: true)
+        try await pager!.write(block: 0, data: payload)
+        let replacement = Data(repeating: 0x55, count: PagingStore.blockSize)
+        try await pager!.write(block: 0, data: replacement)
+        let bytes = await pager!.localProtectionBytes()
+        XCTAssertEqual(bytes, PagingStore.blockSize + 28)
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: root.path).count, 3)
+        pager = nil
+        await backend.fault(offline: true)
+        let reopened = try RemotePager(directory: root, key: key, backend: backend, mirror: true)
+        let restored = try await reopened.read(block: 0)
+        XCTAssertEqual(restored, replacement)
+    }
+    func testMirrorCannotBeEnabledWithoutLocalPages() async throws {
+        let backend = MemoryObjects()
+        var pager: RemotePager? = try RemotePager(directory: root, key: key, backend: backend, create: true)
+        try await pager!.write(block: 0, data: payload)
+        pager = nil
+        XCTAssertThrowsError(try RemotePager(directory: root, key: key, backend: backend, mirror: true))
+    }
+    func testCorruptMirrorFailsInsteadOfServingBadPage() async throws {
+        let backend = MemoryObjects()
+        let pager = try RemotePager(directory: root, key: key, backend: backend, create: true, mirror: true)
+        try await pager.write(block: 0, data: payload)
+        let object = try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)
+            .first { UUID(uuidString: $0.lastPathComponent) != nil }!
+        try Data(repeating: 0, count: 100).write(to: object)
+        await backend.fault(offline: true)
+        do { _ = try await pager.read(block: 0); XCTFail("Corrupt mirror accepted") } catch { }
+    }
+
 }

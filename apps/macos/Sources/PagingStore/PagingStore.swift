@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 import Darwin
 
-public enum PagingError: Error { case invalid, missing, busy, poisoned }
+public enum PagingError: Error { case invalid, missing, busy, poisoned, unavailable }
 
 /// Local encrypted reference backend. Process-restart recovery, not power-loss durability.
 /// The caller must retain the key; no keys are written to this directory.
@@ -14,6 +14,7 @@ final class FileLock {
 
 public final class PagingStore {
     private let directory: URL
+    private let storage: StoreDirectory
     private let key: SymmetricKey
     private var index: [String: String]
     private let mutex = NSLock()
@@ -25,16 +26,13 @@ public final class PagingStore {
 
     public init(directory: URL, key: SymmetricKey) throws {
         self.directory = directory; self.key = key; self.index = [:]
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true,
-                                                attributes: [.posixPermissions: 0o700])
-        let fd = Darwin.open(directory.appendingPathComponent("writer.lock").path, O_CREAT | O_RDWR | O_NOFOLLOW, 0o600)
-        guard fd >= 0 else { throw PagingError.busy }
-        guard flock(fd, LOCK_EX | LOCK_NB) == 0 else { Darwin.close(fd); throw PagingError.busy }
-        self.fileLock = FileLock(fd)
+        guard mkdir(directory.path, 0o700) == 0 || errno == EEXIST else { throw PagingError.unavailable }
+        self.storage = try StoreDirectory(directory)
+        self.fileLock = try storage.lock()
         do {
             let manifest = directory.appendingPathComponent("index.enc")
             if FileManager.default.fileExists(atPath: manifest.path) {
-                let raw = try Data(contentsOf: manifest)
+                let raw = try storage.read("index.enc")
                 let decoded = try AES.GCM.open(AES.GCM.SealedBox(combined: raw), using: key, authenticating: Self.indexAAD)
                 self.index = try JSONDecoder().decode([String: String].self, from: decoded)
                 guard index.count <= Self.maxBlocks else { throw PagingError.invalid }
@@ -55,7 +53,7 @@ public final class PagingStore {
     private func saveIndex(_ values: [String: String]) throws {
         let json = try JSONEncoder().encode(values)
         let encrypted = try AES.GCM.seal(json, using: key, authenticating: Self.indexAAD).combined!
-        try encrypted.write(to: directory.appendingPathComponent("index.enc"), options: .atomic)
+        try storage.write("index.enc", data: encrypted)
     }
     public func write(block: Int, data: Data) throws {
         mutex.lock(); defer { mutex.unlock() }
@@ -67,18 +65,20 @@ public final class PagingStore {
         let old = index[String(block)]
         var next = index; next[String(block)] = object
         do {
-            try encrypted.write(to: directory.appendingPathComponent(object), options: .atomic)
+            try storage.write(object, data: encrypted)
             try saveIndex(next)
             index = next
         } catch { poisoned = true; throw error }
-        if let old = old { try? FileManager.default.removeItem(at: directory.appendingPathComponent(old)) }
+        if let old = old { storage.remove(old) }
     }
     public func read(block: Int) throws -> Data {
         mutex.lock(); defer { mutex.unlock() }
         guard !poisoned else { throw PagingError.poisoned }
         guard block >= 0, block < Self.maxBlocks else { throw PagingError.invalid }
         guard let object = index[String(block)] else { throw PagingError.missing }
-        let raw = try Data(contentsOf: directory.appendingPathComponent(object))
+        let raw: Data
+        do { raw = try storage.read(object) }
+        catch { poisoned = true; throw error }
         let data = try AES.GCM.open(AES.GCM.SealedBox(combined: raw), using: key,
                                     authenticating: Data("\(block)/\(object)".utf8))
         guard data.count == Self.blockSize else { throw PagingError.invalid }

@@ -1,6 +1,6 @@
 # CLOUDSWAP contributor instructions
 
-Start by reading docs/CODEX-HANDOVER.md and docs/CHAT-CONTEXT.md. Check the current branch and working tree before editing; the implementation was developed on feat/macos-foundation in PR #1.
+Start by reading docs/CODEX-HANDOVER.md and docs/CHAT-CONTEXT.md. Check the current branch and working tree before editing; PR #1 is merged and main now contains the implementation and pinned research submodules. Start new feature work from current main.
 
 Keep progressing through authorised implementation and tests without asking for routine permission. Report concrete access, hardware or credential blockers. Preserve existing user changes.
 

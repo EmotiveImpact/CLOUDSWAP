@@ -3,12 +3,12 @@ Updated 10 November 2026. Read this before continuing CLOUDSWAP.
 
 ## Checkout and source of truth
 - Repository: https://github.com/EmotiveImpact/CLOUDSWAP
-- Working branch: `feat/macos-foundation`
-- Draft PR: https://github.com/EmotiveImpact/CLOUDSWAP/pull/1
+- Integration branch: `main` (PR #1 merged on 10 November 2026).
+- Merged PR: https://github.com/EmotiveImpact/CLOUDSWAP/pull/1
 - Last tested implementation commit: `dc57860314fb3a16468fd23258770610f6e111ad`.
-- This handover is a subsequent documentation commit. Do not assume `main` contains the implementation. Fetch and inspect current branch status before editing.
+- PR #1 merged at `7baee59f386abfb391cd6a377228a4034880da18`. All three CI workflows passed on its final head `1448df929e44dadabfe5dfa5c0464eb7eed95665`. Start new work from current `main`, inspect the working tree, and use a new feature branch.
 - Read [chat context](CHAT-CONTEXT.md), [external storage](EXTERNAL-STORAGE.md), [validation](VALIDATION.md), [work packages](WORK-PACKAGES.md) and [research](../research/RESEARCH.md).
-- The original session's local checkout was behind the remote branch, with tracked edits and untracked Linux lab files. Prefer a fresh checkout of the remote feature branch. Preserve local changes if reusing that checkout.
+- The original session's local checkout was behind the remote branch, with tracked edits and untracked Linux lab files. Prefer a fresh recursive checkout of remote main. Preserve local changes if reusing that checkout.
 
 ## What works, precisely
 | Capability | Status |
@@ -50,7 +50,7 @@ External and cloud backends are not a finished automatic two-tier swap product. 
 ## Build and run
 On a suitable Mac with Xcode command-line tools and Rust configured:
 ```sh
-git clone --branch feat/macos-foundation https://github.com/EmotiveImpact/CLOUDSWAP.git
+git clone --branch main --recurse-submodules https://github.com/EmotiveImpact/CLOUDSWAP.git
 cd CLOUDSWAP
 cargo test --offline
 swift test --package-path apps/macos

@@ -4,7 +4,7 @@ Research towards cloud-backed swap for existing macOS applications, with a nativ
 
 **Current build does not redirect macOS swap or demonstrate reclaimed disk space.** It provides a native Mac menu-bar app, encrypted local/external storage, an R2 pager and optional full local mirror. Actual Linux kernel paging and controlled disconnects are verified against a loopback HTTP object service. Live R2, physical drive/Wi-Fi tests and native Mac swap attachment remain unverified.
 
-**Continuing in Codex? Start with [CODEX-HANDOVER.md](docs/CODEX-HANDOVER.md) and [CHAT-CONTEXT.md](docs/CHAT-CONTEXT.md).** The implementation and these records are on `feat/macos-foundation`, in [PR #1](https://github.com/EmotiveImpact/CLOUDSWAP/pull/1). Do not assume `main` contains them.
+**Continuing in Codex? Start with [CODEX-HANDOVER.md](docs/CODEX-HANDOVER.md) and [CHAT-CONTEXT.md](docs/CHAT-CONTEXT.md).** The implementation, research submodules and handover records are on `main`. [PR #1](https://github.com/EmotiveImpact/CLOUDSWAP/pull/1) was merged after all three CI workflows passed.
 
 ## Build on a Mac
 

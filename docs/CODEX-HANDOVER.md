@@ -43,14 +43,18 @@ recorded result are in that document. Never put credential values in the repo.
 
 ## Growable storage increment
 
-`feat/mac-sparse-volume` adds `SparseVolume`, `R2Lab --volume-server` and
+PR #11 (`feat/mac-sparse-volume`) adds `SparseVolume`, `R2Lab --volume-server` and
 `cloudswap-nfs-lab --sparse-lab`: encrypted sparse files with create/resize,
 atomic multi-page mapping commits, truncate/regrow, rename/replacement and
 persistent exclusive-create verifiers. See [SPARSE-VOLUME.md](SPARSE-VOLUME.md)
 for exact limits. Objects are retained and capped, not garbage-collected; this
 is still a synthetic laboratory. The existing fixed-file mode remains tested.
-Check the branch/PR and hosted mounted results before claiming this increment
-is merged or that it provides native system swap.
+Hosted run `42855793571` passed all five growable mounted phases and the original
+fixed-file regression on Intel macOS 15.7.9 and arm64 macOS 15.8.2 at
+`9d304ea3db009731b53a4e66243cf568ca36a9e7`. The reports and source/artifact hashes
+are saved under `docs/evidence/mac-sparse`. This does not provide native system
+swap through NFS. The macOS-latest foundation job was still queued; Intel's full
+foundation checks and the Linux swap regression passed.
 
 The new native suite has 73 passing tests, including uncertain multi-page
 writes, restart, sparse holes, shrink/regrow, authenticated cross-file rejection,

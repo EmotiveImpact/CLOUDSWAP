@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "reports": [
+    {
+      "file": "first-failed-arm64.json",
+      "sha256": "fd7fbc603782659b73c9fb39b5d734fd9defc98aaf9886c5607c9a8f2cab77cb",
+      "workflow_run": 42854261605,
+      "source_commit": "c885f21dce555b3f74f64b7ababd4243935d6e09",
+      "artifact_id": 13781064565,
+      "artifact_zip_sha256": "13a214431a5495d7ecad128fa75efdbf90915cd2fa50b10669d3777caec21b53",
+      "result": "failed_client_stat_allocation_assumption"
+    },
+    {
+      "file": "first-failed-intel.json",
+      "sha256": "d4c6a3539b405b51f28c72c9e32d80a866a234d1bba1872d730fa59562f925ab",
+      "workflow_run": 42854261605,
+      "source_commit": "c885f21dce555b3f74f64b7ababd4243935d6e09",
+      "artifact_id": 13782710916,
+      "artifact_zip_sha256": "efb31b478e6fed8a2a749e19749ef3d8ace723006b16c8a9ae1a1d7cdaee29ec",
+      "result": "failed_client_stat_allocation_assumption"
+    },
+    {
+      "file": "mounted-intel.json",
+      "sha256": "10d8560168c35b7ddb05a4ada94724ed010d5ef912d5f6a3156cfed2d269d190",
+      "workflow_run": 42855793571,
+      "job_id": 129968367623,
+      "source_commit": "9d304ea3db009731b53a4e66243cf568ca36a9e7",
+      "artifact_id": 13782907195,
+      "artifact_zip_sha256": "8fb59eb78b618e24887c51e39efe5a3afe1e30bf7e47a1ee6d332c98da9acef5",
+      "result": "passed"
+    },
+    {
+      "file": "fixed-regression-intel.json",
+      "sha256": "e7802acbf7c46b52e163a30be49ce87853ab9251e3414e6022f84c1c032fe154",
+      "workflow_run": 42855793571,
+      "job_id": 129968367623,
+      "source_commit": "9d304ea3db009731b53a4e66243cf568ca36a9e7",
+      "artifact_id": 13782907195,
+      "artifact_zip_sha256": "8fb59eb78b618e24887c51e39efe5a3afe1e30bf7e47a1ee6d332c98da9acef5",
+      "result": "passed"
+    },
+    {
+      "file": "mounted-arm64.json",
+      "sha256": "6c9baad1152dab26c4eca1c7e2bf729bfee012ee67ce30c72a118b38d2115afb",
+      "workflow_run": 42855793571,
+      "job_id": 129968367188,
+      "source_commit": "9d304ea3db009731b53a4e66243cf568ca36a9e7",
+      "artifact_id": 13783266841,
+      "artifact_zip_sha256": "7a2f02271410d3c629e8fab456236c33f9fa2e67e6e2fd945d22930d8a84e3e7",
+      "result": "passed"
+    },
+    {
+      "file": "fixed-regression-arm64.json",
+      "sha256": "9ca3d2a7202ba3226eae5604456d2129e146aae5ce1f126e2a2edef89dbb50d5",
+      "workflow_run": 42855793571,
+      "job_id": 129968367188,
+      "source_commit": "9d304ea3db009731b53a4e66243cf568ca36a9e7",
+      "artifact_id": 13783266841,
+      "artifact_zip_sha256": "7a2f02271410d3c629e8fab456236c33f9fa2e67e6e2fd945d22930d8a84e3e7",
+      "result": "passed"
+    }
+  ]
+}

@@ -83,17 +83,56 @@ See pinned [NFS getattr](https://github.com/apple-oss-distributions/NFS/blob/937
 [vn_stat](https://github.com/apple-oss-distributions/xnu/blob/f6217f891ac0bb64f3d375211650a4c1ff8ca1ea/bsd/vfs/vfs_vnops.c#L1537)
 and [VFS fallback](https://github.com/apple-oss-distributions/xnu/blob/f6217f891ac0bb64f3d375211650a4c1ff8ca1ea/bsd/vfs/kpi_vfs.c#L2968).
 
-At the initial implementation checkpoint, 73 native tests (16 new sparse-volume
-tests), four Rust tests, the sparse wire/crash/rollback lab and the original
-4 MiB pipelined wire regression passed locally. Mounted results must be read
-from the corresponding workflow artefacts before they are claimed.
+At the implementation checkpoint, 73 native tests (16 new sparse-volume tests),
+four Rust tests, the sparse wire/crash/rollback lab and the original 4 MiB
+pipelined wire regression passed locally.
+
+### Mounted results, 10 November 2026
+
+[Run 42855793571](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42855793571)
+passed both hosted Mac jobs at source commit
+`9d304ea3db009731b53a4e66243cf568ca36a9e7`:
+
+| Host | Lifecycle and cold verification | Allocated backing files after creation | One-second pause cycle |
+|---|---|---|---|
+| Intel macOS 15.7.9 | All five mounted phases passed | 331,776 bytes | Recovered; worker cycle 1.566 s |
+| arm64 macOS 15.8.2 | All five mounted phases passed | 331,776 bytes | Recovered; worker cycle 1.125 s |
+
+Each file had a **logical** size of 1 GiB, with three 64 KiB payload regions and
+a dirty mapped-write modification. This does not mean 1 GiB of data was stored
+or memory was offloaded. Both clients reported 1 GiB through `stat`, while
+NFS GETATTR reported 213,356 bytes of referenced encrypted payload and the
+backing-file inventory occupied 331,776 allocated bytes. After truncation to
+17 bytes and regrowth, NFS referenced one encrypted page (16,412 bytes); retained
+versions increased backing-file allocation to 356,352 bytes. This explicitly
+shows why reclamation is still needed. Filesystem/directory overhead is excluded.
+
+Every phase verified mapped and positioned reads; fresh unmount/process restart
+and remount separated the phases. Cleared tails remained zero after regrowth.
+The paused worker could not finish until the server resumed. Its cycle includes
+startup and verification; it is not a page-fault latency or app responsiveness
+measurement. The original fixed 4 MiB mounted regression also passed on both.
+
+The unmodified JSON reports, original failed attempts, source/job/artifact IDs
+and SHA-256 digests are preserved in [evidence/mac-sparse](evidence/mac-sparse).
+The sparse wire test additionally covers actual process-group crash/reopen and
+authentication failures. No live R2, physical Wi-Fi loss, physical external SSD
+or native anonymous-memory swap through NFS was exercised here.
+
+At the same source revision, Intel foundation CI passed the native tests,
+release packaging and helper/FUSE checks; Linux kernel-swap CI passed. The
+macOS-latest foundation job remained queued at this checkpoint. Its result must
+not be inferred from the separate passing arm64 macOS 15 mounted job.
 
 ## Next kernel gate
 
 This completes a missing file lifecycle, but does not prove XNU accepts this
 NFS filesystem for system swap. Before a new kernel trial: review allocation
 and free-space requirements, the gateway's memory residency, timeout/recovery
-behaviour and object reclamation. The current conservative object budget is
+behaviour and object reclamation. The HTTP transport also needs a streamed
+response-size bound: `R2Client.request` currently calls `URLSession.data(for:)`
+before page-size validation, so its response buffering is not yet a guaranteed
+bounded-memory path. The current conservative object budget is
 deliberately smaller than the advertised maximum sparse file size. No menu-bar
 activation or working-Mac swap changes are included.
 

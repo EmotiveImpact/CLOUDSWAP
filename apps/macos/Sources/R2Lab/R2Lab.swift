@@ -123,7 +123,39 @@ struct R2Client {
 
 extension R2Client: ObjectBackend {
     func put(key: String, data: Data) async throws { _ = try await request("PUT", key: key, body: data) }
-    func get(key: String) async throws -> Data { try await request("GET", key: key) }
+    func get(key: String) async throws -> Data {
+        try await readWithRetry(key: key, budget: .milliseconds(2500))
+    }
+
+    func readWithRetry(key: String, budget: Duration) async throws -> Data {
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: budget)
+        while clock.now < deadline {
+            do {
+                return try await withThrowingTaskGroup(of: Data.self) { group in
+                    group.addTask { try await request("GET", key: key) }
+                    group.addTask {
+                        try await clock.sleep(until: deadline, tolerance: .zero)
+                        throw URLError(.timedOut)
+                    }
+                    defer { group.cancelAll() }
+                    guard let response = try await group.next() else { throw CancellationError() }
+                    return response
+                }
+            } catch let error as URLError {
+                switch error.code {
+                case .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost,
+                     .dnsLookupFailed, .timedOut:
+                    guard clock.now < deadline else { throw error }
+                    let nextAttempt = clock.now.advanced(by: .milliseconds(50))
+                    try await clock.sleep(until: min(nextAttempt, deadline), tolerance: .zero)
+                default:
+                    throw error
+                }
+            }
+        }
+        throw URLError(.timedOut)
+    }
 }
 
 

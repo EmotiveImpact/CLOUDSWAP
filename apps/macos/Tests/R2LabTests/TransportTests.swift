@@ -5,9 +5,19 @@ import Foundation
 final class Stub: URLProtocol {
     static var status = 200
     static var failure: URLError.Code?
+    static var failuresRemaining = 0
+    static var requestCount = 0
+    static var hang = false
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
+        Self.requestCount += 1
+        if Self.hang { return }
+        if Self.failuresRemaining > 0 {
+            Self.failuresRemaining -= 1
+            client?.urlProtocol(self, didFailWithError: URLError(.networkConnectionLost))
+            return
+        }
         if let code = Self.failure { client?.urlProtocol(self, didFailWithError: URLError(code)); return }
         client?.urlProtocol(self, didReceive: HTTPURLResponse(url: request.url!, statusCode: Self.status, httpVersion: nil, headerFields: nil)!, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data("synthetic".utf8))
@@ -22,6 +32,7 @@ final class TransportTests: XCTestCase {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [Stub.self]
         Stub.status = 200; Stub.failure = nil
+        Stub.failuresRemaining = 0; Stub.requestCount = 0; Stub.hang = false
         return try R2Client(env: env, configuration: config)
     }
     func testEndpointValidation() {
@@ -73,5 +84,37 @@ final class TransportTests: XCTestCase {
         Stub.failure = .timedOut
         do { _ = try await c.request("PUT", key: key, body: Data([1])); XCTFail("Acknowledged timeout") }
         catch let error as URLError { XCTAssertEqual(error.code, .timedOut) }
+    }
+    func testPagerReadRetriesTransientDisconnect() async throws {
+        let c = try client(); defer { c.session.invalidateAndCancel() }
+        Stub.failuresRemaining = 1
+        let data = try await c.readWithRetry(key: key, budget: .seconds(1))
+        XCTAssertEqual(data, Data("synthetic".utf8))
+        XCTAssertEqual(Stub.requestCount, 2)
+    }
+
+    func testPagerReadDeadlineCancelsPendingRequest() async throws {
+        let c = try client(); defer { c.session.invalidateAndCancel() }
+        Stub.hang = true
+        let start = ContinuousClock.now
+        do {
+            _ = try await c.readWithRetry(key: key, budget: .milliseconds(100))
+            XCTFail("Pending read completed successfully")
+        } catch let error as URLError {
+            XCTAssertEqual(error.code, .timedOut)
+            XCTAssertLessThan(start.duration(to: .now), .seconds(2))
+        }
+    }
+
+    func testPagerReadDoesNotRetryMissingObject() async throws {
+        let c = try client(); defer { c.session.invalidateAndCancel() }
+        Stub.status = 404
+        do {
+            _ = try await c.readWithRetry(key: key, budget: .seconds(1))
+            XCTFail("Missing object read succeeded")
+        } catch LabError.response(let status) {
+            XCTAssertEqual(status, 404)
+            XCTAssertEqual(Stub.requestCount, 1)
+        }
     }
 }

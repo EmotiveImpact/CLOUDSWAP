@@ -72,7 +72,7 @@ dirty mmap/msync, fsync, five unmount/restart/remount phases and a one-second
 server pause on Intel and arm64. `--ci-mount` is restricted to disposable
 CLOUDSWAP hosted CI. No system swap setting is changed by this laboratory.
 
-At the initial implementation checkpoint, 72 native tests (15 new sparse-volume
+At the initial implementation checkpoint, 73 native tests (16 new sparse-volume
 tests), four Rust tests, the sparse wire/crash/rollback lab and the original
 4 MiB pipelined wire regression passed locally. Mounted results must be read
 from the corresponding workflow artefacts before they are claimed.
@@ -85,3 +85,28 @@ and free-space requirements, the gateway's memory residency, timeout/recovery
 behaviour and object reclamation. The current conservative object budget is
 deliberately smaller than the advertised maximum sparse file size. No menu-bar
 activation or working-Mac swap changes are included.
+
+
+## Kernel source follow-through
+
+Pinned XNU `f6217f891ac0bb64f3d375211650a4c1ff8ca1ea`,
+[`bsd/vm/vm_compressor_backing_file.c`](https://github.com/apple-oss-distributions/xnu/blob/f6217f891ac0bb64f3d375211650a4c1ff8ca1ea/bsd/vm/vm_compressor_backing_file.c),
+opens future swap files with create/truncate, rejects a mount marked NOSWAP,
+sets their size and uses vnode page-in/page-out. The optional pin ioctl failing
+is not fatal in that source. This supports testing the file lifecycle built
+here, but does not prove the running NFS client accepts encrypted swap UPLs.
+
+The same XNU snapshot's
+[`bsd/kern/kern_mman.c`](https://github.com/apple-oss-distributions/xnu/blob/f6217f891ac0bb64f3d375211650a4c1ff8ca1ea/bsd/kern/kern_mman.c#L1738)
+returns ENOSYS from mlockall/munlockall. Do not port a Linux gateway by assuming
+mlockall makes its complete Swift/Rust runtime resident on Mac. Explicit
+critical-region residency or an independently hosted gateway needs a separate
+implementation and measurement. No mlockall call or pressured NFS kernel swap
+experiment was run on the working Mac.
+
+The object-budget regression fills the retained-entry budget with zero-data
+hard links, verifies that further writes are rejected before publication, and
+checks that committed data and checkpoint remain readable. Catalogue commits
+reserve a temporary-file slot so a crash at the budget boundary does not exceed
+the bounded recovery inventory. Native release packaging, signature checks,
+18 existing helper/FUSE tests and 28 diagnostic/R2 tests also passed locally.

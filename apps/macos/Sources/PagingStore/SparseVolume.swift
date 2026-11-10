@@ -205,6 +205,9 @@ public actor SparseVolume {
     private static func now() -> UInt64 { UInt64(Date().timeIntervalSince1970 * 1_000_000_000) }
     private func commit(_ next: Catalogue) throws {
         var next = next
+        // Leave room for the atomic writer's temporary catalogue. A crash must
+        // not push inventory beyond its recovery bound at object exhaustion.
+        try reserve(1)
         guard next.generation < UInt64.max - 1 else { throw VolumeError.capacity }
         next.generation += 1
         try Self.validate(next, mode: catalogue.mode)

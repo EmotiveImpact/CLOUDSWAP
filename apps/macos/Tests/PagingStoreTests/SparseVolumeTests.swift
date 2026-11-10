@@ -215,6 +215,24 @@ final class SparseVolumeTests: XCTestCase {
         let files = try await reopened.list()
         XCTAssertEqual(files.map(\.name), ["a"])
     }
+    func testRetainedObjectBudgetRejectsWritesButKeepsCommittedReadsAvailable() async throws {
+        let directory = root(), key = SymmetricKey(size: .bits256)
+        var volume: SparseVolume? = try SparseVolume(directory: directory, key: key, create: true)
+        let file = try await volume!.create(name: "a", size: 8192)
+        _ = try await volume!.write(file.id, offset: 0, data: Data([7]))
+        volume = nil
+        let seed = directory.appendingPathComponent("retired-seed")
+        try Data().write(to: seed)
+        // Hard links model retained entries without allocating thousands of data pages.
+        for n in 0..<(SparseVolume.maxObjects - 4) {
+            try FileManager.default.linkItem(at: seed, to: directory.appendingPathComponent("retired-\(n)"))
+        }
+        let reopened = try SparseVolume(directory: directory, key: key, create: false)
+        do { _ = try await reopened.write(file.id, offset: 0, data: Data([9])); XCTFail() } catch VolumeError.capacity {}
+        let data = try await reopened.read(file.id, offset: 0, count: 1)
+        XCTAssertEqual(data, Data([7]))
+        try await reopened.checkpoint()
+    }
     func testConcurrentOperationsRejectedAcrossRemoteAwait() async throws {
         let backend = VolumeObjects()
         let volume = try SparseVolume(directory: root(), key: SymmetricKey(size: .bits256), create: true, remote: backend)

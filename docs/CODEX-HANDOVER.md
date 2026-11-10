@@ -19,9 +19,13 @@ The Mac mounted workflow separately tests actual mount, fsync, remount, mmap
 reads and a one-second server pause on Intel and arm64 hosted Macs. Check its
 latest result; wire success does not imply mount success.
 
-No working-Mac swap configuration has been changed. Native macOS system swap,
-physical external-drive unplug, live R2 and internal disk savings remain
-unverified. The prototype is not ready to carry private live application memory.
+No working-Mac swap configuration has been changed. The mounted NFS proof
+passed on Intel macOS 15 and arm64 macOS 26; the extended Intel test also passed
+dirty mmap/msync and cold remount verification. See [integration evidence](INTEGRATION-VALIDATION.md).
+PR #9 separately observed real kernel page-out/page-in against a new APFS
+disk-image volume on the hosted Intel Mac, with complete 8.0625 GiB workload
+integrity. Physical external-drive use/unplug, cloud-backed Mac system swap,
+live R2 and internal disk savings remain unverified. The prototype is not ready to carry private live application memory.
 Read [CHAT-CONTEXT.md](CHAT-CONTEXT.md), [WORK-PACKAGES.md](WORK-PACKAGES.md),
 [the NFS lab](../labs/macos-nfs/README.md) and the dated validation records.
 

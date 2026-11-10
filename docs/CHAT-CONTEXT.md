@@ -75,3 +75,12 @@ installing a third-party filesystem runtime on the working Mac. FUSE-T's binary
 licence was inspected before adoption and contains commercial-use restrictions.
 No binary was installed. This is still aimed at proving the storage path before
 the separate, unresolved native Mac kernel swap gate.
+
+The integrated NFS storage path subsequently passed real mounted read/write,
+flush, process restart, remount and one-second server-pause recovery tests on
+Intel and Apple Silicon hosted Macs. Root prefix writes were then tested using
+the unchanged stock value on Intel. PR #9 builds on that with a disposable APFS
+virtual-volume experiment: actual kernel page-out/page-in traces were captured,
+and all 8.0625 GiB of the synthetic workload verified. This is not yet physical
+external-SSD certification, cloud-backed system swap or a product activation
+feature. The working Mac's swap configuration remains unchanged.

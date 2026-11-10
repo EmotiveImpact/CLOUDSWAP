@@ -9,7 +9,8 @@ proves that another volume can carry actual pages.
 The CI workflow now investigates a separate APFS **disk-image volume** on a
 disposable hosted Intel Mac. It does not use a physical external SSD, change
 startup security, install a driver, run dynamic_pager or remove live swap files.
-The Apple Silicon placement trial remains a separate unverified cohort.
+The workflow repeats this on Intel and Apple Silicon macOS 15; each remains
+a distinct result, not an inherited pass.
 
 ## Reviewed execution and recovery boundaries
 
@@ -28,7 +29,8 @@ The Apple Silicon placement trial remains a separate unverified cohort.
    120-second alarm. The Python supervisor has its own 150-second deadline.
 5. Record same-boot paging snapshots, target-file identities/allocation changes,
    workload integrity, global swap-in/out deltas and filtered fs_usage lines.
-   The trace stores at most 200 target-volume lines and excludes other paths.
+   The trace retains at most 200 target swap-file I/O lines and 40 target-volume
+   metadata lines. It counts matching events beyond the retained-line cap.
 6. Restore the original prefix if it still equals our test prefix. This only
    controls future files; it is **not a drain or migration**. After any attempted
    prefix change, leave the volume mounted and its image intact until the hosted
@@ -51,6 +53,9 @@ counters, not per-process attribution.
 `no_candidate_observed`, skipped preconditions and rejected control writes are
 valid negative observations, never positive acceptance. Integrity failures,
 exceptions and inability to confirm prefix restoration fail the workflow.
+`native_virtual_volume_paging_observed` additionally requires both target-device
+page-out and page-in trace events and successful synthetic integrity verification.
+It does not identify which allocation faulted; global counters remain global.
 The JSON always leaves physical external/cloud swap unverified. CI completion
 alone is not a paging proof, and this experiment measures no net disk saving.
 
@@ -68,3 +73,22 @@ The tests verify the memory limits, every word of the small allocation, invalid
 size rejection, refusal of a large workload without the explicit CI flag, and
 refusal of the placement harness before writing any report or changing settings.
 Do not copy the privileged workflow invocation into a normal terminal.
+
+## First observed result
+
+[Hosted Intel run 42845793503](https://github.com/EmotiveImpact/CLOUDSWAP/actions/runs/42845793503)
+at `fc619cdd504ed9cdf0f665b1c4e461e353affc0f` created a 1 GiB swap file on the
+separate APFS volume, reported 896 4 KiB swap-out pages and 832 swap-in pages, and
+verified all 8.0625 GiB of its synthetic workload. The captured trace contains
+14 `PgOut` and two `PgIn` events naming that volume's swap file and `disk3s1`.
+The prefix was restored and the volume deliberately retained until teardown.
+
+The first report's derived trace counters incorrectly looked for `PAGE_OUT` and
+`PAGE_IN`, so they show zero despite the preserved raw events. The parser now
+recognises the actual `PgOut[...]`/`PgIn[...]` form, checks the exact device and
+swap-file path, and has a regression test using that format. The original report
+is preserved unchanged apart from added source provenance in
+`docs/evidence/mac-placement/intel-first.json`; do not silently rewrite its fields.
+Its nested `system_swap_modified: false` fields describe the read-only collector,
+not the enclosing experiment, which did change the prefix. New reports separate
+collector actions from experiment actions explicitly.

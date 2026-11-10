@@ -42,9 +42,26 @@ def evidence_module():
     return module
 
 
+def page_io(line, target, device):
+    event = re.search(r'\b(PgOut|PgIn)(?:\[[^\]]*\])?\s+.*?\bB=0x([0-9a-fA-F]+)\s+(/dev/\S+)\s+(\S+)', line)
+    if not event or event[3] != '/dev/' + device: return None
+    paths = (str(target) + '/swapfile', '/System/Volumes/Data' + str(target) + '/swapfile')
+    if not any(re.fullmatch(re.escape(prefix) + r'[0-9]+', event[4]) for prefix in paths): return None
+    pid = re.search(r'\.(\d+)\s*$', line)
+    return {'direction': 'out' if event[1] == 'PgOut' else 'in',
+            'bytes': int(event[2], 16), 'device': device, 'path': event[4],
+            'process_pid': int(pid[1]) if pid else None}
+
+
 class Trace:
-    def __init__(self, target):
+    def __init__(self, target, device):
         self.lines = []
+        self.page_lines = []
+        self.counts = {'in': 0, 'out': 0}
+        self.byte_counts = {'in': 0, 'out': 0}
+        self.workload_pid = None
+        self.workload_pageins = 0
+        self.device = device
         self.target = str(target)
         self.process = subprocess.Popen(['/usr/bin/fs_usage', '-w', '-f', 'filesys'],
                                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True)
@@ -52,7 +69,13 @@ class Trace:
     def read(self):
         for line in self.process.stdout:
             text = line.decode(errors='replace').strip()
-            if self.target in text and len(self.lines) < 200: self.lines.append(text[:2000])
+            event = page_io(text, self.target, self.device)
+            if event:
+                self.counts[event['direction']] += 1
+                self.byte_counts[event['direction']] += event['bytes']
+                if event['direction'] == 'in' and event['process_pid'] == self.workload_pid: self.workload_pageins += 1
+                if len(self.page_lines) < 200: self.page_lines.append(text[:2000])
+            elif self.target in text and len(self.lines) < 40: self.lines.append(text[:2000])
     def stop(self):
         if self.process.poll() is None:
             os.killpg(self.process.pid, signal.SIGINT)
@@ -61,15 +84,19 @@ class Trace:
                 os.killpg(self.process.pid, signal.SIGKILL); self.process.wait(timeout=5)
         self.thread.join(timeout=2)
         self.process.stdout.close()
-        return {'exit_code': self.process.returncode, 'target_lines': self.lines,
-                'target_pageout_lines': sum('PAGE_OUT' in line for line in self.lines),
-                'target_pagein_lines': sum('PAGE_IN' in line for line in self.lines),
-                'line_limit': 200}
+        return {'exit_code': self.process.returncode, 'target_lines': self.page_lines,
+                'target_metadata_lines': self.lines, 'target_pageout_lines': self.counts['out'],
+                'target_pagein_lines': self.counts['in'], 'observed_page_io_bytes': self.byte_counts,
+                'workload_target_pageins': self.workload_pageins,
+                'page_line_limit': 200, 'metadata_line_limit': 40,
+                'limitation': 'Observed trace events only; counts do not establish complete tracing or identify which allocation faulted.'}
 
 
-def memory_trial(binary, maximum, env, report, persist, snapshot):
+def memory_trial(binary, maximum, env, report, persist, snapshot, trace):
     process = subprocess.Popen([str(binary), str(maximum)], env=env, stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+    report['workload_pid'] = process.pid
+    trace.workload_pid = process.pid
     selector = selectors.DefaultSelector(); selector.register(process.stdout, selectors.EVENT_READ)
     buffer = bytearray(); deadline = time.monotonic() + 150
     events = []
@@ -125,6 +152,7 @@ def run(args):
               'host': {'os': platform.mac_ver()[0], 'architecture': platform.machine()},
               'native_external_swap_verified': False, 'cloud_swap_verified': False,
               'physical_disconnect_tested': False, 'synthetic_integrity_verified': False,
+              'native_virtual_volume_paging_observed': False,
               'candidate_placement_observed': False, 'prefix_changed': False}
     def persist():
         temporary = report_path.with_suffix('.pending'); temporary.write_text(json.dumps(report, indent=2) + '\n')
@@ -162,16 +190,22 @@ def run(args):
         # A command timeout or unexpected result must never lead to detaching a
         # possible live swap volume. Keep it mounted until runner teardown.
         changed = True
+        report['prefix_change_attempted'] = True
+        report['prefix_changed'] = None
         result = command(['/usr/sbin/sysctl', 'vm.swapfileprefix=' + target])
         report['prefix_change_exit_code'] = result.returncode
         current = sysctl('vm.swapfileprefix')
         report['prefix_changed'] = current == target
         if result.returncode or current != target:
             report['state'] = 'placement_control_rejected'; report['diagnostic'] = result.stderr[:500]; return report
-        snapshot = lambda: evidence.snapshot(str(mount))
+        def snapshot():
+            result = evidence.snapshot(str(mount))
+            result['collector_changed_system_swap'] = result.pop('system_swap_modified')
+            result['experiment_changed_system_swap'] = True
+            return result
         report['before_workload'] = snapshot(); persist()
-        trace = Trace(mount)
-        memory_trial(probe, maximum, dict(os.environ), report, persist, snapshot)
+        trace = Trace(mount, volume['DeviceIdentifier'])
+        memory_trial(probe, maximum, dict(os.environ), report, persist, snapshot, trace)
         report['after_verify'] = snapshot()
         report['comparison'] = evidence.compare(report['before_workload'], report['after_verify'])
         report['candidate_placement_observed'] = report['comparison'].get('candidate_placement_observed', False)
@@ -185,6 +219,10 @@ def run(args):
         if trace:
             try: report['target_io_trace'] = trace.stop()
             except Exception: report['trace_cleanup_failed'] = True
+        io = report.get('target_io_trace', {})
+        report['native_virtual_volume_paging_observed'] = bool(
+            report['candidate_placement_observed'] and report['synthetic_integrity_verified']
+            and io.get('target_pageout_lines', 0) > 0 and io.get('target_pagein_lines', 0) > 0)
         if changed:
             # Restoring the prefix selects future files only. It does not drain
             # pages or make detachment safe, even after the workload exits.

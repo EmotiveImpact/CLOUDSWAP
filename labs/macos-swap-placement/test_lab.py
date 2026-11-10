@@ -13,6 +13,19 @@ LAB = importlib.util.module_from_spec(SPEC); SPEC.loader.exec_module(LAB)
 
 
 class PlacementGuardTests(unittest.TestCase):
+    def test_actual_mac_page_io_format_and_firmlink_alias(self):
+        target = '/Volumes/CloudSwapLab-test'
+        line = '15:36:17.081768 PgOut[AT2P] D=0x000014fc B=0x40000 /dev/disk3s1 ' + target + '/swapfile0 0.000752 W kernel_task.389'
+        event = LAB.page_io(line, target, 'disk3s1')
+        self.assertEqual(event['direction'], 'out')
+        self.assertEqual(event['bytes'], 262144)
+        self.assertEqual(event['process_pid'], 389)
+        alias = line.replace('PgOut[AT2P]', 'PgIn[ST2]').replace(target, '/System/Volumes/Data' + target)
+        self.assertEqual(LAB.page_io(alias, target, 'disk3s1')['direction'], 'in')
+        self.assertIsNone(LAB.page_io(line, target, 'disk4s1'))
+        self.assertIsNone(LAB.page_io(line.replace('swapfile0', 'swapfile0.other'), target, 'disk3s1'))
+        self.assertIsNone(LAB.page_io('stat64 ' + target + '/swapfile0', target, 'disk3s1'))
+
     def test_memory_budget_always_reserves_two_gib_and_caps_twelve(self):
         for gib in (2, 3, 4, 7, 14, 16, 64):
             ram = gib * 1024 * LAB.MIB
